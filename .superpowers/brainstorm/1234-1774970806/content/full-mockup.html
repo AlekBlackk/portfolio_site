@@ -1,0 +1,184 @@
+<h2>Финальный дизайн портфолио</h2>
+<p class="subtitle">IDE-стиль с вкладками, фиолетовые акценты, typing-эффект</p>
+
+<div class="mockup">
+  <div class="mockup-header">Полный макет сайта</div>
+  <div class="mockup-body" style="padding:0;">
+    <!-- Full page mockup -->
+    <div style="background:#0a0a0f;font-family:'JetBrains Mono',monospace;color:#e2e8f0;min-height:600px;overflow:hidden;border-radius:0 0 8px 8px;">
+
+      <!-- Title bar -->
+      <div style="background:#111118;padding:6px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1e1e2e;">
+        <div style="display:flex;gap:6px;">
+          <span style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block;"></span>
+          <span style="width:10px;height:10px;border-radius:50%;background:#eab308;display:inline-block;"></span>
+          <span style="width:10px;height:10px;border-radius:50%;background:#22c55e;display:inline-block;"></span>
+        </div>
+        <span style="color:#666;font-size:11px;">sadmore — portfolio</span>
+        <span style="width:50px;"></span>
+      </div>
+
+      <!-- Tab bar -->
+      <div style="background:#0d0d14;display:flex;border-bottom:1px solid #1e1e2e;font-size:12px;">
+        <div style="padding:8px 16px;background:#0a0a0f;border-bottom:2px solid #a855f7;color:#a855f7;display:flex;align-items:center;gap:6px;">
+          <span style="color:#a855f7;">⌂</span> home.tsx
+        </div>
+        <div style="padding:8px 16px;color:#666;display:flex;align-items:center;gap:6px;">
+          <span>◈</span> projects.tsx
+        </div>
+        <div style="padding:8px 16px;color:#666;display:flex;align-items:center;gap:6px;">
+          <span>✉</span> contacts.tsx
+        </div>
+      </div>
+
+      <!-- Hero section -->
+      <div style="padding:40px 32px;position:relative;">
+        <!-- Grid background hint -->
+        <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 30% 40%, #a855f710 0%, transparent 50%);pointer-events:none;"></div>
+
+        <div style="position:relative;">
+          <div style="color:#666;font-size:11px;margin-bottom:4px;">
+            <span style="color:#c084fc;">1</span> &nbsp;&nbsp;<span style="color:#666;">// привет, я</span>
+          </div>
+          <div style="color:#666;font-size:11px;margin-bottom:4px;">
+            <span style="color:#c084fc;">2</span> &nbsp;&nbsp;<span style="color:#c084fc;">const</span> <span style="color:#60a5fa;">developer</span> = {
+          </div>
+          <div style="font-size:24px;margin:12px 0 12px 32px;color:#e2e8f0;">
+            <span style="color:#666;font-size:11px;position:absolute;left:32px;">3</span>
+            <span style="margin-left:20px;">name: <span style="color:#a855f7;">"sadmore"</span></span>
+          </div>
+          <div style="font-size:14px;margin:4px 0 4px 32px;color:#9ca3af;">
+            <span style="color:#666;font-size:11px;position:absolute;left:32px;">4</span>
+            <span style="margin-left:20px;">role: <span style="color:#34d399;">"Full-Stack Developer"</span><span style="animation:blink 1s infinite;color:#a855f7;">|</span></span>
+          </div>
+          <div style="color:#666;font-size:11px;margin-top:4px;">
+            <span style="color:#c084fc;">5</span> &nbsp;&nbsp;};
+          </div>
+
+          <div style="margin-top:20px;display:flex;gap:10px;padding-left:32px;">
+            <div style="background:#a855f7;color:#fff;padding:6px 16px;border-radius:4px;font-size:12px;cursor:pointer;">
+              → GitHub
+            </div>
+            <div style="border:1px solid #a855f7;color:#a855f7;padding:6px 16px;border-radius:4px;font-size:12px;cursor:pointer;">
+              → Telegram
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div style="border-top:1px solid #1e1e2e;margin:0 32px;"></div>
+
+      <!-- Projects section -->
+      <div style="padding:24px 32px;">
+        <div style="color:#666;font-size:11px;margin-bottom:16px;">
+          <span style="color:#c084fc;">// projects</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <!-- Card 1 -->
+          <div style="background:#111118;border:1px solid #1e1e2e;border-radius:8px;overflow:hidden;transition:all 0.3s;">
+            <div style="height:80px;background:linear-gradient(135deg,#a855f720,#6366f120);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:28px;opacity:0.6;">🤖</span>
+            </div>
+            <div style="padding:12px;">
+              <div style="color:#a855f7;font-size:13px;font-weight:600;">AI Image Bot</div>
+              <div style="color:#9ca3af;font-size:11px;margin-top:4px;">Telegram-бот для генерации изображений через ComfyUI</div>
+              <div style="margin-top:8px;display:flex;gap:6px;">
+                <span style="background:#a855f720;color:#a855f7;padding:2px 8px;border-radius:12px;font-size:10px;">Python</span>
+                <span style="background:#a855f720;color:#a855f7;padding:2px 8px;border-radius:12px;font-size:10px;">AI</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div style="background:#111118;border:1px solid #1e1e2e;border-radius:8px;overflow:hidden;">
+            <div style="height:80px;background:linear-gradient(135deg,#6366f120,#ec489920);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:28px;opacity:0.6;">🎮</span>
+            </div>
+            <div style="padding:12px;">
+              <div style="color:#a855f7;font-size:13px;font-weight:600;">Game Engine</div>
+              <div style="color:#9ca3af;font-size:11px;margin-top:4px;">2D игровой движок на чистом JavaScript</div>
+              <div style="margin-top:8px;display:flex;gap:6px;">
+                <span style="background:#a855f720;color:#a855f7;padding:2px 8px;border-radius:12px;font-size:10px;">JS</span>
+                <span style="background:#a855f720;color:#a855f7;padding:2px 8px;border-radius:12px;font-size:10px;">Canvas</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div style="background:#111118;border:1px solid #1e1e2e;border-radius:8px;overflow:hidden;">
+            <div style="height:80px;background:linear-gradient(135deg,#22c55e20,#a855f720);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:28px;opacity:0.6;">🌐</span>
+            </div>
+            <div style="padding:12px;">
+              <div style="color:#a855f7;font-size:13px;font-weight:600;">Portfolio Site</div>
+              <div style="color:#9ca3af;font-size:11px;margin-top:4px;">Этот самый сайт — портфолио в стиле IDE</div>
+              <div style="margin-top:8px;display:flex;gap:6px;">
+                <span style="background:#a855f720;color:#a855f7;padding:2px 8px;border-radius:12px;font-size:10px;">HTML</span>
+                <span style="background:#a855f720;color:#a855f7;padding:2px 8px;border-radius:12px;font-size:10px;">CSS</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div style="background:#111118;border:1px solid #1e1e2e;border-radius:8px;overflow:hidden;">
+            <div style="height:80px;background:linear-gradient(135deg,#f59e0b20,#ef444420);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:28px;opacity:0.6;">⚡</span>
+            </div>
+            <div style="padding:12px;">
+              <div style="color:#a855f7;font-size:13px;font-weight:600;">CLI Tool</div>
+              <div style="color:#9ca3af;font-size:11px;margin-top:4px;">Утилита командной строки для автоматизации</div>
+              <div style="margin-top:8px;display:flex;gap:6px;">
+                <span style="background:#a855f720;color:#a855f7;padding:2px 8px;border-radius:12px;font-size:10px;">Go</span>
+                <span style="background:#a855f720;color:#a855f7;padding:2px 8px;border-radius:12px;font-size:10px;">CLI</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contacts section -->
+      <div style="border-top:1px solid #1e1e2e;margin:0 32px;"></div>
+      <div style="padding:24px 32px 32px;">
+        <div style="color:#666;font-size:11px;margin-bottom:12px;">
+          <span style="color:#c084fc;">// contacts</span>
+        </div>
+        <div style="display:flex;gap:20px;font-size:12px;">
+          <span style="color:#9ca3af;">→ <span style="color:#a855f7;">GitHub</span></span>
+          <span style="color:#9ca3af;">→ <span style="color:#a855f7;">Telegram</span></span>
+          <span style="color:#9ca3af;">→ <span style="color:#a855f7;">Email</span></span>
+        </div>
+      </div>
+
+      <!-- Status bar -->
+      <div style="background:#111118;padding:4px 16px;display:flex;justify-content:space-between;font-size:10px;color:#666;border-top:1px solid #1e1e2e;">
+        <div style="display:flex;gap:12px;">
+          <span>main</span>
+          <span>UTF-8</span>
+        </div>
+        <div style="display:flex;gap:12px;">
+          <span>Ln 42, Col 1</span>
+          <span style="color:#a855f7;">TypeScript</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes blink { 0%,50% { opacity:1; } 51%,100% { opacity:0; } }
+</style>
+
+<div class="section" style="margin-top:24px;">
+  <h3>Ключевые элементы дизайна</h3>
+  <ul style="color:#ccc;font-size:14px;line-height:1.8;">
+    <li><strong>Title bar</strong> — кнопки закрытия окна (красный/жёлтый/зелёный)</li>
+    <li><strong>Табы навигации</strong> — home.tsx / projects.tsx / contacts.tsx</li>
+    <li><strong>Hero</strong> — код-блок с номерами строк, typing-эффект, мигающий курсор</li>
+    <li><strong>Карточки проектов</strong> — градиентные превью, теги технологий, hover-анимация</li>
+    <li><strong>Контакты</strong> — минимальный блок со ссылками</li>
+    <li><strong>Status bar</strong> — как в VS Code (branch, encoding, language)</li>
+    <li><strong>Фон</strong> — тёмный #0a0a0f + сеточная текстура + фиолетовый gradient glow</li>
+  </ul>
+</div>

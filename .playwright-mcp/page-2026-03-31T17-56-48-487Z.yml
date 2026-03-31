@@ -1,0 +1,102 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e7]: sadmore — portfolio
+  - navigation [ref=e8]:
+    - button "⌂ home.tsx" [ref=e9] [cursor=pointer]:
+      - generic [ref=e10]: ⌂
+      - generic [ref=e11]: home.tsx
+    - button "◈ projects.tsx" [ref=e12] [cursor=pointer]:
+      - generic [ref=e13]: ◈
+      - generic [ref=e14]: projects.tsx
+    - button "✉ contacts.tsx" [ref=e15] [cursor=pointer]:
+      - generic [ref=e16]: ✉
+      - generic [ref=e17]: contacts.tsx
+  - main [ref=e18]:
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - generic [ref=e23]: "1"
+          - generic [ref=e24]: // привет, я
+        - generic [ref=e25]:
+          - generic [ref=e26]: "2"
+          - generic [ref=e27]: "const developer = {"
+        - generic [ref=e28]:
+          - generic [ref=e29]: "3"
+          - generic [ref=e30]: "name: \"sadmore\""
+        - generic [ref=e31]:
+          - generic [ref=e32]: "4"
+          - generic [ref=e33]:
+            - text: "role:"
+            - generic [ref=e34]: "\"F|\""
+        - generic [ref=e35]:
+          - generic [ref=e36]: "5"
+          - generic [ref=e37]: "};"
+      - generic [ref=e38]:
+        - link "→ GitHub" [ref=e39] [cursor=pointer]:
+          - /url: https://github.com/sadmore
+        - link "→ Telegram" [ref=e40] [cursor=pointer]:
+          - /url: "#"
+    - separator [ref=e43]
+    - generic [ref=e44]:
+      - generic [ref=e45]: // projects
+      - generic [ref=e46]:
+        - link "🤖 AI Image Bot Telegram-бот для генерации изображений через ComfyUI с поддержкой 7 режимов Python AI Telegram" [ref=e47] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e48]: 🤖
+          - generic [ref=e49]:
+            - generic [ref=e50]: AI Image Bot
+            - generic [ref=e51]: Telegram-бот для генерации изображений через ComfyUI с поддержкой 7 режимов
+            - generic [ref=e52]:
+              - generic [ref=e53]: Python
+              - generic [ref=e54]: AI
+              - generic [ref=e55]: Telegram
+        - link "🎮 Game Engine 2D игровой движок на чистом JavaScript с физикой и рендерингом JavaScript Canvas" [ref=e56] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e57]: 🎮
+          - generic [ref=e58]:
+            - generic [ref=e59]: Game Engine
+            - generic [ref=e60]: 2D игровой движок на чистом JavaScript с физикой и рендерингом
+            - generic [ref=e61]:
+              - generic [ref=e62]: JavaScript
+              - generic [ref=e63]: Canvas
+        - link "🌐 Portfolio Site Этот самый сайт — портфолио в стиле IDE с анимациями и неоновыми акцентами HTML CSS JS" [ref=e64] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e65]: 🌐
+          - generic [ref=e66]:
+            - generic [ref=e67]: Portfolio Site
+            - generic [ref=e68]: Этот самый сайт — портфолио в стиле IDE с анимациями и неоновыми акцентами
+            - generic [ref=e69]:
+              - generic [ref=e70]: HTML
+              - generic [ref=e71]: CSS
+              - generic [ref=e72]: JS
+        - link "⚡ CLI Tool Утилита командной строки для автоматизации рутинных задач Go CLI" [ref=e73] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e74]: ⚡
+          - generic [ref=e75]:
+            - generic [ref=e76]: CLI Tool
+            - generic [ref=e77]: Утилита командной строки для автоматизации рутинных задач
+            - generic [ref=e78]:
+              - generic [ref=e79]: Go
+              - generic [ref=e80]: CLI
+    - separator [ref=e81]
+    - generic [ref=e82]:
+      - generic [ref=e83]: // contacts
+      - generic [ref=e84]:
+        - link "→ GitHub" [ref=e85] [cursor=pointer]:
+          - /url: "#"
+          - text: →
+          - generic [ref=e86]: GitHub
+        - link "→ Telegram" [ref=e87] [cursor=pointer]:
+          - /url: "#"
+          - text: →
+          - generic [ref=e88]: Telegram
+        - link "→ Email" [ref=e89] [cursor=pointer]:
+          - /url: "#"
+          - text: →
+          - generic [ref=e90]: Email
+  - generic [ref=e91]:
+    - generic [ref=e92]:
+      - generic [ref=e93]: main
+      - generic [ref=e94]: UTF-8
+    - generic [ref=e95]:
+      - generic [ref=e96]: Ln 42, Col 1
+      - generic [ref=e97]: TypeScript

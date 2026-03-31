@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sadmore — portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Title Bar -->
+  <div class="title-bar">
+    <div class="window-buttons">
+      <span class="window-btn window-btn--close"></span>
+      <span class="window-btn window-btn--minimize"></span>
+      <span class="window-btn window-btn--maximize"></span>
+    </div>
+    <span class="title-bar__text">sadmore — portfolio</span>
+    <div style="width:50px;"></div>
+  </div>
+
+  <!-- Tab Bar -->
+  <nav class="tab-bar">
+    <button class="tab active" data-target="hero">
+      <span class="tab__icon">⌂</span>
+      <span class="tab__label">home.tsx</span>
+    </button>
+    <button class="tab" data-target="projects">
+      <span class="tab__icon">◈</span>
+      <span class="tab__label">projects.tsx</span>
+    </button>
+    <button class="tab" data-target="contacts">
+      <span class="tab__icon">✉</span>
+      <span class="tab__label">contacts.tsx</span>
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div class="hero__glow"></div>
+      <div class="hero__code">
+        <div class="code-line">
+          <span class="line-number">1</span>
+          <span class="code-comment">// привет, я</span>
+        </div>
+        <div class="code-line">
+          <span class="line-number">2</span>
+          <span><span class="code-keyword">const</span> <span class="code-var">developer</span> = {</span>
+        </div>
+        <div class="code-line">
+          <span class="line-number">3</span>
+          <span>&nbsp;&nbsp;name: <span class="code-name">"sadmore"</span></span>
+        </div>
+        <div class="code-line">
+          <span class="line-number">4</span>
+          <span>&nbsp;&nbsp;role: <span class="code-string--green code-role">"<span id="typing-text"></span><span
+                class="cursor">|</span>"</span></span>
+        </div>
+        <div class="code-line">
+          <span class="line-number">5</span>
+          <span>};</span>
+        </div>
+      </div>
+
+      <div class="hero__buttons">
+        <a href="#" class="btn btn--primary">→ GitHub</a>
+        <a href="#" class="btn btn--outline">→ Telegram</a>
+      </div>
+      <div class="hero__graphics">
+        <!-- Floating Terminal -->
+        <div class="floating-panel panel-terminal">
+          <div class="panel-header">
+            <div class="window-dots"><span></span><span></span><span></span></div>
+            <div class="panel-title">build_process.sh</div>
+            <div style="width: 42px"></div> <!-- spacer -->
+          </div>
+          <div class="panel-body term-content">
+            <div class="t-line"><span class="t-prompt">~/project ➜</span> <span class="t-cmd">npm run build -- --detailed</span></div>
+            <div class="t-line t-dim">  [vite v5.0.0] building for production...</div>
+            <div class="t-line t-dim">  transforming (34) src/components/Hero.tsx</div>
+            <div class="t-line t-success">✓ 42 modules transformed.</div>
+            <div class="t-line t-dim">dist/index.html   <span class="t-size">1.24 kB</span></div>
+            <div class="t-line t-dim">dist/style.css    <span class="t-size">12.45 kB</span> <span class="t-highlight">[optimized]</span></div>
+            <div class="t-line t-dim">dist/script.js    <span class="t-size">8.12 kB</span> <span class="t-highlight">[optimized]</span></div>
+            <div class="t-line t-success" style="margin-top: 8px;">✓ built in 1.42s</div>
+            <div class="t-line"><span class="t-prompt">~/project ➜</span><span class="t-cursor"></span></div>
+          </div>
+        </div>
+
+        <!-- Floating Stats/Monitor -->
+        <div class="floating-panel panel-stats">
+          <div class="panel-header" style="justify-content: space-between;">
+            <div class="panel-title" style="color: var(--text-secondary);">⚙ system_metrics</div>
+            <div class="panel-ping"><span class="ping-dot"></span> 12ms ping</div>
+          </div>
+          <div class="panel-body">
+            <div class="metric-group">
+              <div class="metric-info">
+                <span class="metric-name">CPU.Load [Threads: 8]</span>
+                <span class="metric-val">42%</span>
+              </div>
+              <div class="metric-bar"><div class="metric-fill" style="width: 42%; animation: metric-pulse 3s infinite;"></div></div>
+            </div>
+            <div class="metric-group">
+              <div class="metric-info">
+                <span class="metric-name">MEM.Usage [Heap]</span>
+                <span class="metric-val">2.8/8 GB</span>
+              </div>
+              <div class="metric-bar"><div class="metric-fill" style="width: 35%; animation: metric-pulse-2 4s infinite alternate;"></div></div>
+            </div>
+            <div class="metric-group">
+              <div class="metric-info">
+                <span class="metric-name">NET.Tx [Localhost]</span>
+                <span class="metric-val">1.4 MB/s</span>
+              </div>
+              <div class="metric-bar"><div class="metric-fill" style="width: 65%; background: var(--string-green); box-shadow: 0 0 10px var(--string-green); animation: metric-pulse-steps 2s steps(4) infinite;"></div></div>
+            </div>
+            
+            <div class="tech-grid">
+              <div class="tech-box active" style="--box-accent: var(--keyword-blue);">React</div>
+              <div class="tech-box">TS</div>
+              <div class="tech-box">Node</div>
+              <div class="tech-box active" style="--box-accent: var(--string-green)">Tailwind</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Projects -->
+    <section class="projects" id="projects">
+      <div class="section-comment">// projects</div>
+      <div class="projects__grid">
+
+        <a href="#" class="card" style="animation-delay: 0s; --card-color: #a855f7;">
+          <div class="card__top">
+            <div class="card__dots"><span></span><span></span><span></span></div>
+            <div class="card__file">bot.py</div>
+          </div>
+          <div class="card__preview" style="--preview-bg: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(99,102,241,0.15));">
+            <div class="card__preview-bg"></div>
+            <span class="card__icon">🤖</span>
+          </div>
+          <div class="card__body">
+            <div class="card__title">AI Image Bot</div>
+            <div class="card__desc">Telegram-бот для генерации изображений через ComfyUI с поддержкой 7 режимов</div>
+            <div class="card__tags">
+              <span class="tag">Python</span>
+              <span class="tag">AI</span>
+              <span class="tag">Telegram</span>
+            </div>
+          </div>
+          <div class="card__glow"></div>
+        </a>
+
+        <a href="#" class="card" style="animation-delay: 0.1s; --card-color: #ec4899;">
+          <div class="card__top">
+            <div class="card__dots"><span></span><span></span><span></span></div>
+            <div class="card__file">engine.js</div>
+          </div>
+          <div class="card__preview" style="--preview-bg: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(236,72,153,0.15));">
+            <div class="card__preview-bg"></div>
+            <span class="card__icon">🎮</span>
+          </div>
+          <div class="card__body">
+            <div class="card__title">Game Engine</div>
+            <div class="card__desc">2D игровой движок на чистом JavaScript с физикой и рендерингом</div>
+            <div class="card__tags">
+              <span class="tag">JavaScript</span>
+              <span class="tag">Canvas</span>
+            </div>
+          </div>
+          <div class="card__glow"></div>
+        </a>
+
+        <a href="#" class="card" style="animation-delay: 0.2s; --card-color: #22c55e;">
+          <div class="card__top">
+            <div class="card__dots"><span></span><span></span><span></span></div>
+            <div class="card__file">portfolio.tsx</div>
+          </div>
+          <div class="card__preview" style="--preview-bg: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(168,85,247,0.15));">
+            <div class="card__preview-bg"></div>
+            <span class="card__icon">🌐</span>
+          </div>
+          <div class="card__body">
+            <div class="card__title">Portfolio Site</div>
+            <div class="card__desc">Этот самый сайт — портфолио в стиле IDE с анимациями и неоновыми акцентами</div>
+            <div class="card__tags">
+              <span class="tag">HTML</span>
+              <span class="tag">CSS</span>
+              <span class="tag">JS</span>
+            </div>
+          </div>
+          <div class="card__glow"></div>
+        </a>
+
+        <a href="#" class="card" style="animation-delay: 0.3s; --card-color: #f59e0b;">
+          <div class="card__top">
+            <div class="card__dots"><span></span><span></span><span></span></div>
+            <div class="card__file">task_runner.go</div>
+          </div>
+          <div class="card__preview" style="--preview-bg: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(239,68,68,0.15));">
+            <div class="card__preview-bg"></div>
+            <span class="card__icon">⚡</span>
+          </div>
+          <div class="card__body">
+            <div class="card__title">CLI Tool</div>
+            <div class="card__desc">Утилита командной строки для автоматизации рутинных задач</div>
+            <div class="card__tags">
+              <span class="tag">Go</span>
+              <span class="tag">CLI</span>
+            </div>
+          </div>
+          <div class="card__glow"></div>
+        </a>
+
+        <!-- Empty / Upcoming Project 1 -->
+        <a href="#" class="card" style="animation-delay: 0.4s; --card-color: #64748b;">
+          <div class="card__top">
+            <div class="card__dots"><span></span><span></span><span></span></div>
+            <div class="card__file">upcoming_v1.ts</div>
+          </div>
+          <div class="card__preview" style="--preview-bg: linear-gradient(135deg, rgba(148,163,184,0.1), rgba(100,116,139,0.1));">
+            <div class="card__preview-bg"></div>
+            <span class="card__icon" style="opacity: 0.6; filter: grayscale(1);">🔒</span>
+          </div>
+          <div class="card__body">
+            <div class="card__title">Project In Progress</div>
+            <div class="card__desc">Секретный проект, который пока находится в разработке. Загляните позже!</div>
+            <div class="card__tags">
+              <span class="tag" style="border-style: dashed;">???</span>
+            </div>
+          </div>
+          <div class="card__glow"></div>
+        </a>
+
+        <!-- Empty / Upcoming Project 2 -->
+        <a href="#" class="card" style="animation-delay: 0.5s; --card-color: #64748b;">
+          <div class="card__top">
+            <div class="card__dots"><span></span><span></span><span></span></div>
+            <div class="card__file">idea_bucket.md</div>
+          </div>
+          <div class="card__preview" style="--preview-bg: linear-gradient(135deg, rgba(148,163,184,0.1), rgba(100,116,139,0.1));">
+            <div class="card__preview-bg"></div>
+            <span class="card__icon" style="opacity: 0.6; filter: grayscale(1);">💡</span>
+          </div>
+          <div class="card__body">
+            <div class="card__title">Future Idea</div>
+            <div class="card__desc">Здесь скоро появится что-то интересное. Место забронировано под новую идею.</div>
+            <div class="card__tags">
+              <span class="tag" style="border-style: dashed;">WIP</span>
+            </div>
+          </div>
+          <div class="card__glow"></div>
+        </a>
+
+        <!-- Empty / Upcoming Project 3 -->
+        <a href="#" class="card" style="animation-delay: 0.6s; --card-color: #64748b;">
+          <div class="card__top">
+            <div class="card__dots"><span></span><span></span><span></span></div>
+            <div class="card__file">design_system.css</div>
+          </div>
+          <div class="card__preview" style="--preview-bg: linear-gradient(135deg, rgba(148,163,184,0.1), rgba(100,116,139,0.1));">
+            <div class="card__preview-bg"></div>
+            <span class="card__icon" style="opacity: 0.6; filter: grayscale(1);">🎨</span>
+          </div>
+          <div class="card__body">
+            <div class="card__title">Design System</div>
+            <div class="card__desc">Глобальная система стилей и UI-компонентов. В процессе проектирования.</div>
+            <div class="card__tags">
+              <span class="tag" style="border-style: dashed;">Concept</span>
+            </div>
+          </div>
+          <div class="card__glow"></div>
+        </a>
+
+        <!-- Empty / Upcoming Project 4 -->
+        <a href="#" class="card" style="animation-delay: 0.7s; --card-color: #64748b;">
+          <div class="card__top">
+            <div class="card__dots"><span></span><span></span><span></span></div>
+            <div class="card__file">database.sql</div>
+          </div>
+          <div class="card__preview" style="--preview-bg: linear-gradient(135deg, rgba(148,163,184,0.1), rgba(100,116,139,0.1));">
+            <div class="card__preview-bg"></div>
+            <span class="card__icon" style="opacity: 0.6; filter: grayscale(1);">🗄️</span>
+          </div>
+          <div class="card__body">
+            <div class="card__title">Data Visualizer</div>
+            <div class="card__desc">Инструмент для создания красивых графиков на основе сырых данных.</div>
+            <div class="card__tags">
+              <span class="tag" style="border-style: dashed;">Planning</span>
+            </div>
+          </div>
+          <div class="card__glow"></div>
+        </a>
+
+      </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- Contacts -->
+    <section class="contacts" id="contacts">
+      <div class="section-comment">// contacts</div>
+      <div class="contacts__links">
+        <a href="#" class="contact-link">→ <span class="contact-link__name">GitHub</span></a>
+        <a href="#" class="contact-link">→ <span class="contact-link__name">Telegram</span></a>
+        <a href="#" class="contact-link">→ <span class="contact-link__name">Email</span></a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-bar__group">
+      <span>main</span>
+      <span>UTF-8</span>
+    </div>
+    <div class="status-bar__group">
+      <span>Ln 42, Col 1</span>
+      <span class="status-bar__item--accent">TypeScript</span>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
