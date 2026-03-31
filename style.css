@@ -968,14 +968,65 @@ body::before {
   }
 
   .ambient-spotlight.is-active,
-  .cursor-glow.is-active {
+  .cursor-glow.is-active,
+  .cursor-dot.is-active,
+  .cursor-ring.is-active {
     opacity: 1;
+  }
+
+  * {
+    cursor: none !important;
+  }
+
+  .cursor-dot,
+  .cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    will-change: transform, width, height;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .cursor-dot {
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.8), 0 0 20px rgba(168, 85, 247, 0.8);
+  }
+
+  .cursor-ring {
+    width: 24px;
+    height: 24px;
+    border: 1px solid rgba(168, 85, 247, 0.6);
+    border-radius: 50%;
+    background: transparent;
+    transition: width 0.3s ease, height 0.3s ease, background 0.3s ease, border-color 0.3s ease, opacity 0.5s ease;
+  }
+
+  .cursor-ring.cursor-hover {
+    width: 44px;
+    height: 44px;
+    background: rgba(168, 85, 247, 0.1);
+    border-color: rgba(168, 85, 247, 1);
+  }
+
+  .cursor-dot.cursor-hover {
+    width: 0;
+    height: 0;
+    opacity: 0;
   }
 }
 
 @media (max-width: 1024px) or (pointer: coarse) {
   .ambient-spotlight,
-  .cursor-glow {
+  .cursor-glow,
+  .cursor-dot,
+  .cursor-ring {
     display: none !important;
   }
 }

@@ -330,6 +330,8 @@
   // Ambient Spotlight & Glow Trail
   const spotlight = document.querySelector('[data-spotlight]');
   const glow = document.querySelector('[data-glow]');
+  const cursorDot = document.querySelector('[data-cursor-dot]');
+  const cursorRing = document.querySelector('[data-cursor-ring]');
 
   if (spotlight && glow && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     let mouseX = window.innerWidth / 2;
@@ -347,6 +349,8 @@
         isMouseActive = true;
         spotlight.classList.add('is-active');
         glow.classList.add('is-active');
+        if (cursorDot) cursorDot.classList.add('is-active');
+        if (cursorRing) cursorRing.classList.add('is-active');
       }
 
       clearTimeout(activityTimeout);
@@ -354,6 +358,8 @@
         isMouseActive = false;
         spotlight.classList.remove('is-active');
         glow.classList.remove('is-active');
+        if (cursorDot) cursorDot.classList.remove('is-active');
+        if (cursorRing) cursorRing.classList.remove('is-active');
       }, 3000);
     });
 
@@ -361,6 +367,20 @@
       isMouseActive = false;
       spotlight.classList.remove('is-active');
       glow.classList.remove('is-active');
+      if (cursorDot) cursorDot.classList.remove('is-active');
+      if (cursorRing) cursorRing.classList.remove('is-active');
+    });
+
+    const interactiveElements = document.querySelectorAll('a, button, .tab, .window-btn, .card');
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        if (cursorRing) cursorRing.classList.add('cursor-hover');
+        if (cursorDot) cursorDot.classList.add('cursor-hover');
+      });
+      el.addEventListener('mouseleave', () => {
+        if (cursorRing) cursorRing.classList.remove('cursor-hover');
+        if (cursorDot) cursorDot.classList.remove('cursor-hover');
+      });
     });
 
     const animateEffects = () => {
@@ -374,7 +394,9 @@
       
       if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
         glow.style.transform = `translate(${glowX}px, ${glowY}px) translate(-50%, -50%)`;
+        if (cursorRing) cursorRing.style.transform = `translate(${glowX}px, ${glowY}px) translate(-50%, -50%)`;
       }
+      if (cursorDot) cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
       
       // Micro-deformation: shift the spotlight grid elastically based on mouse movement speed
       const stretchX = dx * 0.15;
