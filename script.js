@@ -326,4 +326,73 @@
   });
 
   cards.forEach(card => cardObserver.observe(card));
+
+  // Ambient Spotlight & Glow Trail
+  const spotlight = document.querySelector('[data-spotlight]');
+  const glow = document.querySelector('[data-glow]');
+
+  if (spotlight && glow && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let glowX = mouseX;
+    let glowY = mouseY;
+    let isMouseActive = false;
+    let activityTimeout = null;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      
+      if (!isMouseActive) {
+        isMouseActive = true;
+        spotlight.classList.add('is-active');
+        glow.classList.add('is-active');
+      }
+
+      clearTimeout(activityTimeout);
+      activityTimeout = setTimeout(() => {
+        isMouseActive = false;
+        spotlight.classList.remove('is-active');
+        glow.classList.remove('is-active');
+      }, 3000);
+    });
+
+    document.addEventListener('mouseleave', () => {
+      isMouseActive = false;
+      spotlight.classList.remove('is-active');
+      glow.classList.remove('is-active');
+    });
+
+    const animateEffects = () => {
+      // Glow trail lerp
+      glowX += (mouseX - glowX) * 0.12;
+      glowY += (mouseY - glowY) * 0.12;
+      
+      // Calculate velocity/drag for micro-deformation
+      const dx = mouseX - glowX;
+      const dy = mouseY - glowY;
+      
+      if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+        glow.style.transform = `translate(${glowX}px, ${glowY}px) translate(-50%, -50%)`;
+      }
+      
+      // Micro-deformation: shift the spotlight grid elastically based on mouse movement speed
+      const stretchX = dx * 0.15;
+      const stretchY = dy * 0.15;
+      spotlight.style.transform = `translate(${stretchX}px, ${stretchY}px)`;
+      
+      // Offset the mask so the spotlight stays centered on the exact cursor position 
+      // despite the element itself shifting
+      const maskX = mouseX - stretchX;
+      const maskY = mouseY - stretchY;
+      
+      const mask = `radial-gradient(circle 350px at ${maskX}px ${maskY}px, black 0%, transparent 80%)`;
+      spotlight.style.webkitMaskImage = mask;
+      spotlight.style.maskImage = mask;
+
+      requestAnimationFrame(animateEffects);
+    };
+
+    animateEffects();
+  }
 })();
