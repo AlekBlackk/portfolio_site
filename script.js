@@ -417,4 +417,130 @@
 
     animateEffects();
   }
+
+  // --- Minimap Implementation ---
+  const minimap = document.getElementById('minimap');
+  const minimapCanvas = document.getElementById('minimap-canvas');
+  const minimapSlider = document.getElementById('minimap-slider');
+
+  if (minimap && minimapCanvas && minimapSlider) {
+    const ctx = minimapCanvas.getContext('2d', { alpha: true });
+    
+    const drawMinimap = () => {
+      if (window.innerWidth <= 768) return;
+
+      const docHeight = document.documentElement.scrollHeight;
+      const mapHeight = minimap.offsetHeight;
+      const mapWidth = minimap.offsetWidth;
+      
+      minimapCanvas.width = mapWidth;
+      minimapCanvas.height = mapHeight;
+      minimapCanvas.style.width = `${mapWidth}px`;
+      minimapCanvas.style.height = `${mapHeight}px`;
+      
+      const scale = mapHeight / docHeight;
+      
+      ctx.clearRect(0, 0, mapWidth, mapHeight);
+      
+      const elements = document.querySelectorAll('section, .card, .floating-panel');
+      
+      elements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        const top = window.scrollY + rect.top;
+        const mappedTop = top * scale;
+        const mappedHeight = Math.max(rect.height * scale, 1);
+        
+        let baseColor = 'rgba(226, 232, 240, 0.2)'; 
+        if (el.classList.contains('card')) baseColor = 'rgba(168, 85, 247, 0.4)';
+        else if (el.id === 'hero') baseColor = 'rgba(52, 211, 153, 0.4)';
+        else if (el.id === 'projects') baseColor = 'rgba(96, 165, 250, 0.4)';
+        else if (el.classList.contains('floating-panel')) baseColor = 'rgba(234, 179, 8, 0.4)';
+        
+        const lineHeight = 2;
+        const lineSpacing = 2;
+        const padding = 3;
+        const maxLineWidth = mapWidth - padding * 2;
+        
+        // Simple predictable random based on element position to prevent flickering
+        let seed = Math.floor(top);
+        const random = () => {
+          let x = Math.sin(seed++) * 10000;
+          return x - Math.floor(x);
+        };
+
+        for (let y = mappedTop + 2; y < mappedTop + mappedHeight - 2; y += (lineHeight + lineSpacing)) {
+          if (random() > 0.85) continue; // skip some lines for realism (blank lines)
+          
+          const indent = Math.floor(random() * 4) * 4;
+          const lineWidth = Math.max(6, random() * (maxLineWidth - indent));
+          
+          ctx.fillStyle = baseColor;
+          // Sprinkle keywords and strings
+          const r = random();
+          if (r > 0.8) ctx.fillStyle = 'rgba(168, 85, 247, 0.6)'; // keyword
+          else if (r > 0.6) ctx.fillStyle = 'rgba(52, 211, 153, 0.6)'; // string
+          
+          ctx.fillRect(padding + indent, y, lineWidth, lineHeight);
+        }
+      });
+    };
+
+    const updateSlider = () => {
+      if (window.innerWidth <= 768) return;
+      
+      const docHeight = document.documentElement.scrollHeight;
+      const mapHeight = minimap.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      
+      const scrollY = window.scrollY;
+      const scale = mapHeight / docHeight;
+      
+      const sliderTop = scrollY * scale;
+      const sliderHeight = viewportHeight * scale;
+      
+      minimapSlider.style.transform = `translateY(${sliderTop}px)`;
+      minimapSlider.style.height = `${Math.max(sliderHeight, 10)}px`;
+    };
+
+    window.addEventListener('resize', () => {
+      requestAnimationFrame(() => {
+        drawMinimap();
+        updateSlider();
+      });
+    });
+    
+    window.addEventListener('scroll', updateSlider, { passive: true });
+    
+    // Initial render with a slight delay to ensure fonts/layout are ready
+    setTimeout(() => {
+      drawMinimap();
+      updateSlider();
+    }, 200);
+
+    let isDraggingMinimap = false;
+
+    const scrollPageToMinimapY = (y) => {
+      const rect = minimap.getBoundingClientRect();
+      const relativeY = y - rect.top;
+      const percentage = Math.max(0, Math.min(1, relativeY / rect.height));
+      const targetScroll = percentage * document.documentElement.scrollHeight - (window.innerHeight / 2);
+      window.scrollTo({ top: targetScroll, behavior: isDraggingMinimap ? 'auto' : 'smooth' });
+    };
+
+    minimap.addEventListener('mousedown', (e) => {
+      isDraggingMinimap = true;
+      scrollPageToMinimapY(e.clientY);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isDraggingMinimap) {
+        e.preventDefault(); // Prevent text selection
+        scrollPageToMinimapY(e.clientY);
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDraggingMinimap = false;
+    });
+  }
 })();

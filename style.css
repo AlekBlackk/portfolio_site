@@ -151,6 +151,7 @@ body::before {
 .main {
   position: relative;
   z-index: 1;
+  padding-right: 35px; /* space for minimap */
 }
 
 .main::after {
@@ -876,10 +877,61 @@ body::before {
   color: var(--accent);
 }
 
-/* ── Removed redundant transition ── */
+/* ── Minimap ── */
+.minimap {
+  position: fixed;
+  right: 0;
+  top: 72px; /* title-bar + tab-bar height */
+  bottom: 28px; /* status-bar height */
+  width: 35px;
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border);
+  z-index: 90;
+  cursor: pointer;
+}
+
+#minimap-canvas {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.minimap-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(168, 85, 247, 0.1);
+  border-left: 2px solid var(--accent);
+  pointer-events: none;
+  transition: background 0.2s ease;
+}
+
+.minimap:hover .minimap-slider {
+  background: rgba(168, 85, 247, 0.2);
+}
+
+/* Hide default scrollbar */ /* Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+/* IE, Edge and Firefox */
+body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
+  .minimap {
+    display: none;
+  }
+  
+  .main {
+    padding-right: 0;
+  }
+
   .hero {
     padding: 40px 20px 32px;
     min-height: auto;
