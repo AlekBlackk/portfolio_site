@@ -103,10 +103,16 @@
       return sections[sections.length - 1].id;
     }
 
-    const focusY = scrollY + getSectionActivationViewportTop({
-      viewportHeight,
-      stickyOffset
-    });
+    const availableViewport = Math.max(viewportHeight - stickyOffset, 0);
+    const maxScroll = Math.max(documentHeight - viewportHeight, 0);
+    const scrollProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
+    
+    // Dynamic focus line: shifts from 30% to 75% of viewport as we scroll
+    // This allows sections near the bottom of the page to be activated 
+    // even if they don't reach the middle of the screen.
+    const focusRatio = 0.3 + (scrollProgress * 0.45);
+    const focusY = scrollY + stickyOffset + (availableViewport * focusRatio);
+
     let activeId = sections[0].id;
 
     for (const section of sections) {
@@ -344,7 +350,7 @@
     window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
-      
+
       if (!isMouseActive) {
         isMouseActive = true;
         spotlight.classList.add('is-active');
@@ -387,27 +393,27 @@
       // Glow trail lerp
       glowX += (mouseX - glowX) * 0.12;
       glowY += (mouseY - glowY) * 0.12;
-      
+
       // Calculate velocity/drag for micro-deformation
       const dx = mouseX - glowX;
       const dy = mouseY - glowY;
-      
+
       if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
         glow.style.transform = `translate(${glowX}px, ${glowY}px) translate(-50%, -50%)`;
         if (cursorRing) cursorRing.style.transform = `translate(${glowX}px, ${glowY}px) translate(-50%, -50%)`;
       }
       if (cursorDot) cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
-      
+
       // Micro-deformation: shift the spotlight grid elastically based on mouse movement speed
       const stretchX = dx * 0.15;
       const stretchY = dy * 0.15;
       spotlight.style.transform = `translate(${stretchX}px, ${stretchY}px)`;
-      
+
       // Offset the mask so the spotlight stays centered on the exact cursor position 
       // despite the element itself shifting
       const maskX = mouseX - stretchX;
       const maskY = mouseY - stretchY;
-      
+
       const mask = `radial-gradient(circle 350px at ${maskX}px ${maskY}px, black 0%, transparent 80%)`;
       spotlight.style.webkitMaskImage = mask;
       spotlight.style.maskImage = mask;
@@ -425,42 +431,42 @@
 
   if (minimap && minimapCanvas && minimapSlider) {
     const ctx = minimapCanvas.getContext('2d', { alpha: true });
-    
+
     const drawMinimap = () => {
       if (window.innerWidth <= 768) return;
 
       const docHeight = document.documentElement.scrollHeight;
       const mapHeight = minimap.offsetHeight;
       const mapWidth = minimap.offsetWidth;
-      
+
       minimapCanvas.width = mapWidth;
       minimapCanvas.height = mapHeight;
       minimapCanvas.style.width = `${mapWidth}px`;
       minimapCanvas.style.height = `${mapHeight}px`;
-      
+
       const scale = mapHeight / docHeight;
-      
+
       ctx.clearRect(0, 0, mapWidth, mapHeight);
-      
+
       const elements = document.querySelectorAll('section, .card, .floating-panel');
-      
+
       elements.forEach(el => {
         const rect = el.getBoundingClientRect();
         const top = window.scrollY + rect.top;
         const mappedTop = top * scale;
         const mappedHeight = Math.max(rect.height * scale, 1);
-        
-        let baseColor = 'rgba(226, 232, 240, 0.2)'; 
+
+        let baseColor = 'rgba(226, 232, 240, 0.2)';
         if (el.classList.contains('card')) baseColor = 'rgba(168, 85, 247, 0.4)';
         else if (el.id === 'hero') baseColor = 'rgba(52, 211, 153, 0.4)';
         else if (el.id === 'projects') baseColor = 'rgba(96, 165, 250, 0.4)';
         else if (el.classList.contains('floating-panel')) baseColor = 'rgba(234, 179, 8, 0.4)';
-        
+
         const lineHeight = 2;
         const lineSpacing = 2;
         const padding = 3;
         const maxLineWidth = mapWidth - padding * 2;
-        
+
         // Simple predictable random based on element position to prevent flickering
         let seed = Math.floor(top);
         const random = () => {
@@ -470,16 +476,16 @@
 
         for (let y = mappedTop + 2; y < mappedTop + mappedHeight - 2; y += (lineHeight + lineSpacing)) {
           if (random() > 0.85) continue; // skip some lines for realism (blank lines)
-          
+
           const indent = Math.floor(random() * 4) * 4;
           const lineWidth = Math.max(6, random() * (maxLineWidth - indent));
-          
+
           ctx.fillStyle = baseColor;
           // Sprinkle keywords and strings
           const r = random();
           if (r > 0.8) ctx.fillStyle = 'rgba(168, 85, 247, 0.6)'; // keyword
           else if (r > 0.6) ctx.fillStyle = 'rgba(52, 211, 153, 0.6)'; // string
-          
+
           ctx.fillRect(padding + indent, y, lineWidth, lineHeight);
         }
       });
@@ -487,17 +493,17 @@
 
     const updateSlider = () => {
       if (window.innerWidth <= 768) return;
-      
+
       const docHeight = document.documentElement.scrollHeight;
       const mapHeight = minimap.offsetHeight;
       const viewportHeight = window.innerHeight;
-      
+
       const scrollY = window.scrollY;
       const scale = mapHeight / docHeight;
-      
+
       const sliderTop = scrollY * scale;
       const sliderHeight = viewportHeight * scale;
-      
+
       minimapSlider.style.transform = `translateY(${sliderTop}px)`;
       minimapSlider.style.height = `${Math.max(sliderHeight, 10)}px`;
     };
@@ -508,9 +514,9 @@
         updateSlider();
       });
     });
-    
+
     window.addEventListener('scroll', updateSlider, { passive: true });
-    
+
     // Initial render with a slight delay to ensure fonts/layout are ready
     setTimeout(() => {
       drawMinimap();
