@@ -329,9 +329,32 @@
     <!-- Contacts -->
     <section class="contacts" id="contacts">
       <div class="section-comment">// contacts</div>
-      <div class="contacts__links">
-        <a href="#" class="contact-link">→ <span class="contact-link__name">GitHub</span></a>
-        <a href="#" class="contact-link">→ <span class="contact-link__name">Telegram</span></a>
+      <div class="contacts-terminal">
+        <div class="terminal-header">
+          <span class="terminal-header__dot"></span>
+          <span class="terminal-header__dot"></span>
+          <span class="terminal-header__dot"></span>
+          <span class="terminal-header__title">connections.sh</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">➜</span> <span class="terminal-command">ls -l
+              /socials</span></div>
+          <div class="terminal-list">
+            <a href="https://github.com/" target="_blank" class="terminal-item">
+              <span class="terminal-item__type">link</span>
+              <span class="terminal-item__name">github.tsx</span>
+              <span class="terminal-item__arrow">→</span>
+              <span class="terminal-item__value">sadmore</span>
+            </a>
+            <a href="https://t.me/" target="_blank" class="terminal-item">
+              <span class="terminal-item__type">link</span>
+              <span class="terminal-item__name">telegram.tsx</span>
+              <span class="terminal-item__arrow">→</span>
+              <span class="terminal-item__value">@sadmore</span>
+            </a>
+          </div>
+          <div class="terminal-line"><span class="terminal-prompt">➜</span> <span class="terminal-cursor"></span></div>
+        </div>
       </div>
     </section>
 
@@ -340,12 +363,43 @@
   <!-- Status Bar -->
   <div class="status-bar">
     <div class="status-bar__group">
-      <span>main</span>
-      <span>UTF-8</span>
+      <div class="status-bar__item status-bar__item--git">
+        <span class="status-bar__icon"></span>
+        <span>main*</span>
+      </div>
+      <div class="status-bar__item status-bar__item--sync">
+        <span class="status-bar__icon">↻</span>
+      </div>
+      <div class="status-bar__item status-bar__item--errors">
+        <span class="status-bar__icon">⨉</span>
+        <span>0</span>
+        <span class="status-bar__icon" style="margin-left: 6px;">△</span>
+        <span>0</span>
+      </div>
     </div>
+
     <div class="status-bar__group">
-      <span>Ln 42, Col 1</span>
-      <span class="status-bar__item--accent">TypeScript</span>
+      <div class="status-bar__item status-bar__item--interactive" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <span class="status-bar__icon">↑</span>
+        <span>Back to Top</span>
+      </div>
+      <div class="status-bar__item">
+        <span>Ln 42, Col 1</span>
+      </div>
+      <div class="status-bar__item">
+        <span>Spaces: 2</span>
+      </div>
+      <div class="status-bar__item">
+        <span>UTF-8</span>
+      </div>
+      <div class="status-bar__item status-bar__item--accent">
+        <span class="status-bar__icon">{}</span>
+        <span>TypeScript JSX</span>
+      </div>
+      <div class="status-bar__item status-bar__item--prettier">
+        <span class="status-bar__icon">✓</span>
+        <span>Prettier</span>
+      </div>
     </div>
   </div>
 
