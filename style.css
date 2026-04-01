@@ -21,6 +21,17 @@
   --green: #22c55e;
 }
 
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--bg);
+}
+
 /* ── Reset & Base ── */
 *,
 *::before,
@@ -45,17 +56,7 @@ body {
   /* space for status bar */
 }
 
-/* ── Grid Background ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(255, 255, 255, 0.03) 49px, rgba(255, 255, 255, 0.03) 50px),
-    repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(255, 255, 255, 0.03) 49px, rgba(255, 255, 255, 0.03) 50px);
-  pointer-events: none;
-  z-index: 0;
-}
+/* ── Grid Background Removed ── */
 
 /* ── Title Bar ── */
 .title-bar {
@@ -101,6 +102,12 @@ body::before {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  transition: all 0.3s ease;
+}
+
+.title-bar:hover .title-bar__text {
+  color: var(--accent-light);
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
 }
 
 /* ── Tab Bar ── */
@@ -133,8 +140,9 @@ body::before {
 }
 
 .tab:hover {
-  color: var(--text-secondary);
-  background: rgba(168, 85, 247, 0.05);
+  color: var(--accent-light);
+  background: rgba(168, 85, 247, 0.08);
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
 }
 
 .tab.active {
@@ -630,6 +638,7 @@ body::before {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
+  perspective: 1500px; /* Enable 3D space for cards */
 }
 
 @keyframes cardReveal {
@@ -655,8 +664,10 @@ body::before {
   flex-direction: column;
   opacity: 0;
   z-index: 1;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease;
+  transition: transform 0.15s ease-out, box-shadow 0.4s ease, border-color 0.4s ease;
   overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .card.visible {
@@ -697,20 +708,45 @@ body::before {
 }
 
 .card:hover {
-  transform: translateY(-6px) !important;
-  border-color: transparent;
+  border-color: rgba(168, 85, 247, 0.4);
   box-shadow:
-    0 16px 32px rgba(0, 0, 0, 0.4),
-    0 0 24px rgba(0, 0, 0, 0.2);
+    0 24px 48px rgba(0, 0, 0, 0.5),
+    0 0 32px rgba(168, 85, 247, 0.2);
+}
+
+.card__shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.12) 0%,
+    transparent 70%
+  );
+  z-index: 15;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover .card__shine {
+  opacity: 1;
 }
 
 .card:hover::before {
   opacity: 1;
-  background: linear-gradient(135deg, var(--card-color, var(--accent)), transparent);
+  background: linear-gradient(
+    145deg, 
+    var(--card-color, var(--accent)) 0%, 
+    rgba(255, 255, 255, 0.4) 15%, 
+    transparent 60%
+  );
 }
 
 .card:hover .card__glow {
-  opacity: 0.12;
+  opacity: 0.2;
 }
 
 /* Simulated terminal top bar */
@@ -754,6 +790,12 @@ body::before {
   font-size: 11px;
   color: var(--text-muted);
   font-family: monospace;
+  transition: all 0.3s ease;
+}
+
+.card:hover .card__file {
+  color: var(--card-color, var(--accent-light));
+  text-shadow: 0 0 8px var(--card-color, rgba(168, 85, 247, 0.6));
 }
 
 .card__preview {
@@ -819,13 +861,14 @@ body::before {
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 8px;
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
   display: flex;
   align-items: center;
 }
 
 .card:hover .card__title {
-  color: var(--card-color, var(--accent));
+  color: var(--card-color, var(--accent-light));
+  text-shadow: 0 0 12px var(--card-color, rgba(168, 85, 247, 0.4));
 }
 
 .card__title::before {
@@ -1244,9 +1287,7 @@ body {
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    background:
-      repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(168, 85, 247, 0.1) 49px, rgba(168, 85, 247, 0.1) 50px),
-      repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(168, 85, 247, 0.1) 49px, rgba(168, 85, 247, 0.1) 50px);
+    background: transparent;
     opacity: 0;
     transition: opacity 0.5s ease;
     will-change: mask-image, -webkit-mask-image;

@@ -369,6 +369,39 @@
 
   cards.forEach(card => cardObserver.observe(card));
 
+  // --- 3D Holographic Tilt Effect for Cards ---
+  cards.forEach(card => {
+    // Dynamically inject the shine element
+    const shine = document.createElement('div');
+    shine.className = 'card__shine';
+    card.appendChild(shine);
+
+    card.addEventListener('mousemove', e => {
+      if (!card.classList.contains('revealed') && !card.classList.contains('visible')) return;
+
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      // Calculate rotation based on cursor distance from center
+      const rotateX = ((y - centerY) / centerY) * -8; // Max 8 degrees
+      const rotateY = ((x - centerX) / centerX) * 8;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+
+      // Update CSS variables for the shine gradient position
+      card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+      card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+    });
+  });
+
   // Ambient Spotlight & Glow Trail
   const spotlight = document.querySelector('[data-spotlight]');
   const glow = document.querySelector('[data-glow]');
@@ -755,4 +788,119 @@
       }, 3000);
     }
   });
+
+  // --- Interactive Digital Background Implementation ---
+  const canvas = document.getElementById('bg-canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouse = { x: -1000, y: -1000, radius: 180 };
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    class Particle {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.originX = x;
+        this.originY = y;
+        this.size = 1.2;
+        this.vx = 0;
+        this.vy = 0;
+        this.friction = 0.92;
+        this.ease = 0.08;
+      }
+
+      draw() {
+        // Calculate dynamic brightness based on mouse distance
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        // Minimum brightness is now 0.45 to make distant particles more visible
+        const brightness = Math.max(0.45, 1 - dist / 500); 
+
+        // Increased base opacity slightly for better visibility
+        ctx.fillStyle = `rgba(168, 85, 247, ${0.35 * brightness})`; 
+        ctx.beginPath();
+        // Dot gets slightly larger near cursor
+        const scale = 1 + (brightness * 0.4);
+        ctx.arc(this.x, this.y, this.size * scale, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Add a faint outer glow for dots very close to the mouse
+        if (dist < 100) {
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = 'rgba(168, 85, 247, 0.5)';
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      update() {
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < mouse.radius) {
+          const angle = Math.atan2(dy, dx);
+          const force = (mouse.radius - distance) / mouse.radius;
+          // Apply repulsive force
+          this.vx -= force * Math.cos(angle) * 1.8;
+          this.vy -= force * Math.sin(angle) * 1.8;
+        }
+
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        this.x += this.vx + (this.originX - this.x) * this.ease;
+        this.y += this.vy + (this.originY - this.y) * this.ease;
+      }
+    }
+
+    function initParticles() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      particles = [];
+      const gap = 50; // Match VS Code grid feel
+      for (let y = 0; y < canvas.height + gap; y += gap) {
+        for (let x = 0; x < canvas.width + gap; x += gap) {
+          particles.push(new Particle(x, y));
+        }
+      }
+    }
+
+    function animateBackground() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.update();
+        p.draw();
+
+        // Connect nearby points to form a subtle constellation near mouse
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 150) {
+          ctx.strokeStyle = `rgba(168, 85, 247, ${0.2 * (1 - dist / 150)})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mouse.x, mouse.y);
+          ctx.stroke();
+        }
+      }
+      requestAnimationFrame(animateBackground);
+    }
+
+    window.addEventListener('resize', () => {
+      initParticles();
+    });
+
+    initParticles();
+    animateBackground();
+  }
 })();
