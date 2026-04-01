@@ -1,0 +1,16 @@
+# Claude Code
+.claude/
+.superpowers/
+
+# Playwright MCP logs
+.playwright-mcp/
+
+# Internal docs (plans, specs)
+docs/superpowers/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
