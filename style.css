@@ -269,7 +269,20 @@ body::before {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+}
+
+.btn-icon {
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.btn:hover .btn-icon {
+  transform: translateX(-2px) scale(1.1);
+}
+
+.btn--primary:hover .btn-icon {
+  filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
 }
 
 .btn--primary {
