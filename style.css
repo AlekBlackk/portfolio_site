@@ -151,7 +151,8 @@ body::before {
 .main {
   position: relative;
   z-index: 1;
-  padding-right: 35px; /* space for minimap */
+  padding-right: 35px;
+  /* space for minimap */
 }
 
 .main::after {
@@ -881,8 +882,10 @@ body::before {
 .minimap {
   position: fixed;
   right: 0;
-  top: 72px; /* title-bar + tab-bar height */
-  bottom: 28px; /* status-bar height */
+  top: 72px;
+  /* title-bar + tab-bar height */
+  bottom: 28px;
+  /* status-bar height */
   width: 35px;
   background: var(--bg-panel);
   border-left: 1px solid var(--border);
@@ -912,10 +915,12 @@ body::before {
   background: rgba(168, 85, 247, 0.2);
 }
 
-/* Hide default scrollbar */ /* Chrome, Safari and Opera */
+/* Hide default scrollbar */
+/* Chrome, Safari and Opera */
 ::-webkit-scrollbar {
   display: none;
 }
+
 /* IE, Edge and Firefox */
 body {
   -ms-overflow-style: none;
@@ -927,7 +932,7 @@ body {
   .minimap {
     display: none;
   }
-  
+
   .main {
     padding-right: 0;
   }
@@ -1075,6 +1080,7 @@ body {
 }
 
 @media (max-width: 1024px) or (pointer: coarse) {
+
   .ambient-spotlight,
   .cursor-glow,
   .cursor-dot,
