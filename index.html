@@ -98,8 +98,9 @@
 
         <!-- Floating Stats/Monitor -->
         <div class="floating-panel panel-stats">
-          <div class="panel-header" style="justify-content: space-between;">
-            <div class="panel-title" style="color: var(--text-secondary);">⚙ system_metrics</div>
+          <div class="panel-header">
+            <div class="window-dots"><span></span><span></span><span></span></div>
+            <div class="panel-title">⚙ system_metrics</div>
             <div class="panel-ping"><span class="ping-dot"></span> 12ms ping</div>
           </div>
           <div class="panel-body">
@@ -379,6 +380,10 @@
     </div>
 
     <div class="status-bar__group">
+      <div class="status-bar__item status-bar__item--interactive" id="restore-panels-btn" style="display: none;">
+        <span class="status-bar__icon">↺</span>
+        <span>Restore Windows</span>
+      </div>
       <div class="status-bar__item status-bar__item--interactive" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <span class="status-bar__icon">↑</span>
         <span>Back to Top</span>

@@ -106,7 +106,7 @@
     const availableViewport = Math.max(viewportHeight - stickyOffset, 0);
     const maxScroll = Math.max(documentHeight - viewportHeight, 0);
     const scrollProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
-    
+
     // Dynamic focus line: shifts from 30% to 75% of viewport as we scroll
     // This allows sections near the bottom of the page to be activated 
     // even if they don't reach the middle of the screen.
@@ -127,12 +127,49 @@
     return activeId;
   }
 
+  function pinFloatingPanelPosition(panel) {
+    if (!panel || typeof panel.getBoundingClientRect !== 'function') {
+      return false;
+    }
+
+    if (panel.dataset?.panelPinned === 'true') {
+      return true;
+    }
+
+    const container = panel.offsetParent;
+
+    if (!container || typeof container.getBoundingClientRect !== 'function') {
+      return false;
+    }
+
+    const panelRect = panel.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const top = Math.round(panelRect.top - containerRect.top);
+    const left = Math.round(panelRect.left - containerRect.left);
+
+    if (!Number.isFinite(top) || !Number.isFinite(left)) {
+      return false;
+    }
+
+    panel.style.top = `${top}px`;
+    panel.style.left = `${left}px`;
+    panel.style.right = 'auto';
+    panel.style.bottom = 'auto';
+
+    if (panel.dataset) {
+      panel.dataset.panelPinned = 'true';
+    }
+
+    return true;
+  }
+
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
       getActiveSectionId,
       getSectionViewportTop,
       getScrollSpacerHeight,
-      getScrollTargetY
+      getScrollTargetY,
+      pinFloatingPanelPosition
     };
   }
 
@@ -549,4 +586,174 @@
       isDraggingMinimap = false;
     });
   }
+
+  // --- Floating Panels Interactivity ---
+  const floatingPanels = document.querySelectorAll('.floating-panel');
+  const restoreBtn = document.getElementById('restore-panels-btn');
+
+  const updateRestoreBtn = () => {
+    const anyHidden = Array.from(document.querySelectorAll('.floating-panel')).some(p => p.style.display === 'none');
+    if (restoreBtn) {
+      restoreBtn.style.display = anyHidden ? 'flex' : 'none';
+      if (anyHidden) {
+        restoreBtn.classList.add('status-bar__item--accent');
+      } else {
+        restoreBtn.classList.remove('status-bar__item--accent');
+      }
+    }
+  };
+
+  if (restoreBtn) {
+    restoreBtn.addEventListener('click', () => {
+      document.querySelectorAll('.floating-panel').forEach(p => {
+        if (p.style.display === 'none') {
+          p.style.display = '';
+          p.style.opacity = '0';
+          setTimeout(() => {
+            p.style.opacity = '1';
+            p.style.transform = 'translate3d(0, 0, 0)';
+            updateRestoreBtn();
+          }, 50);
+        }
+      });
+    });
+  }
+
+  floatingPanels.forEach(panel => {
+    pinFloatingPanelPosition(panel);
+  });
+
+  floatingPanels.forEach(panel => {
+    let isDragging = false;
+    let currentX;
+    let currentY;
+    let initialX;
+    let initialY;
+    let xOffset = 0;
+    let yOffset = 0;
+
+    const dragStart = (e) => {
+      // Don't start drag if clicking on buttons or interactive content
+      if (e.target.closest('.window-dots') || e.target.closest('.tech-box')) return;
+
+      pinFloatingPanelPosition(panel);
+
+      if (e.type === "touchstart") {
+        initialX = e.touches[0].clientX - xOffset;
+        initialY = e.touches[0].clientY - yOffset;
+      } else {
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+      }
+
+      if (e.target.closest('.panel-header') || e.target === panel) {
+        isDragging = true;
+        panel.style.transition = 'none'; // Disable transition during drag
+      }
+    };
+
+    const dragEnd = () => {
+      if (!isDragging) return;
+      initialX = currentX;
+      initialY = currentY;
+      isDragging = false;
+      panel.style.transition = ''; // Restore transition
+    };
+
+    const drag = (e) => {
+      if (isDragging) {
+        e.preventDefault();
+
+        if (e.type === "touchmove") {
+          currentX = e.touches[0].clientX - initialX;
+          currentY = e.touches[0].clientY - initialY;
+        } else {
+          currentX = e.clientX - initialX;
+          currentY = e.clientY - initialY;
+        }
+
+        xOffset = currentX;
+        yOffset = currentY;
+
+        setTranslate(currentX, currentY, panel);
+      }
+    };
+
+    const setTranslate = (xPos, yPos, el) => {
+      // Combine with the base floating animation by using a wrapper or just modifying the transform
+      // Here we use a simpler approach: just update the translate
+      el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+    };
+
+    panel.addEventListener("touchstart", dragStart, false);
+    panel.addEventListener("touchend", dragEnd, false);
+    panel.addEventListener("touchmove", drag, false);
+
+    panel.addEventListener("mousedown", dragStart, false);
+    window.addEventListener("mouseup", dragEnd, false);
+    window.addEventListener("mousemove", drag, false);
+
+    // Functional Buttons (Updated)
+    const dots = panel.querySelectorAll('.window-dots span');
+
+    if (dots.length >= 3) {
+      // Red: Close (Hide)
+      dots[0].addEventListener('click', (e) => {
+        e.stopPropagation();
+        panel.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        panel.style.opacity = '0';
+        panel.style.transform = (panel.style.transform || '') + ' scale(0.5) translateY(50px)';
+        setTimeout(() => {
+          panel.style.display = 'none';
+          updateRestoreBtn();
+        }, 400);
+      });
+
+      // Yellow: Minimize (Simulated)
+      dots[1].addEventListener('click', (e) => {
+        e.stopPropagation();
+        pinFloatingPanelPosition(panel);
+        if (panel.classList.contains('minimized')) {
+          panel.classList.remove('minimized');
+          panel.style.height = '';
+          panel.querySelector('.panel-body').style.display = '';
+        } else {
+          panel.classList.add('minimized');
+          panel.style.height = '40px';
+          panel.querySelector('.panel-body').style.display = 'none';
+        }
+      });
+
+      // Green: Reset Position
+      dots[2].addEventListener('click', (e) => {
+        e.stopPropagation();
+        pinFloatingPanelPosition(panel);
+        xOffset = 0;
+        yOffset = 0;
+        initialX = 0;
+        initialY = 0;
+        currentX = 0;
+        currentY = 0;
+        panel.style.transition = 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        panel.style.transform = 'translate3d(0, 0, 0)';
+      });
+    }
+    // --- Dynamic Metrics Update ---
+    const cpuVal = document.querySelector('.panel-stats .metric-group:nth-child(1) .metric-val');
+    const cpuBar = document.querySelector('.panel-stats .metric-group:nth-child(1) .metric-fill');
+    const memVal = document.querySelector('.panel-stats .metric-group:nth-child(2) .metric-val');
+    const memBar = document.querySelector('.panel-stats .metric-group:nth-child(2) .metric-fill');
+
+    if (cpuVal && memVal) {
+      setInterval(() => {
+        const cpu = 30 + Math.floor(Math.random() * 25);
+        const mem = (2.4 + Math.random() * 0.8).toFixed(1);
+
+        cpuVal.textContent = `${cpu}%`;
+        cpuBar.style.width = `${cpu}%`;
+        memVal.textContent = `${mem}/8 GB`;
+        memBar.style.width = `${(mem / 8) * 100}%`;
+      }, 3000);
+    }
+  });
 })();
