@@ -341,45 +341,60 @@
     <!-- Contacts -->
     <section class="contacts" id="contacts">
       <div class="section-comment">// contacts</div>
-      <div class="contacts-terminal">
-        <div class="terminal-header">
-          <span class="terminal-header__dot"></span>
-          <span class="terminal-header__dot"></span>
-          <span class="terminal-header__dot"></span>
-          <span class="terminal-header__title">connections.sh</span>
-        </div>
-        <div class="terminal-body">
-          <div class="terminal-line"><span class="terminal-prompt">➜</span> <span class="terminal-command">ls -l
-              /socials</span></div>
-          <div class="terminal-list">
-            <a href="https://github.com/AlekBlackk" target="_blank" class="terminal-item">
-              <span class="terminal-item__type">link</span>
-              <span class="terminal-item__name">github.tsx</span>
-              <span class="terminal-item__arrow">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path
-                    d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.28 1.15-.28 2.35 0 3.5-.73 1.02-1.08 2.25-1 3.5 0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4">
-                  </path>
-                  <path d="M9 18c-4.51 2-5-2-7-2"></path>
-                </svg>
-              </span>
-              <span class="terminal-item__value">sadmore</span>
-            </a>
-            <a href="https://t.me/" target="_blank" class="terminal-item">
-              <span class="terminal-item__type">link</span>
-              <span class="terminal-item__name">telegram.tsx</span>
-              <span class="terminal-item__arrow">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="22" y1="2" x2="11" y2="13"></line>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-              </span>
-              <span class="terminal-item__value">@sadmore</span>
-            </a>
+
+      <div class="contacts-content">
+        <div class="contacts-terminal">
+          <div class="terminal-header">
+            <span class="terminal-header__dot"></span>
+            <span class="terminal-header__dot"></span>
+            <span class="terminal-header__dot"></span>
+            <span class="terminal-header__title">connections.sh</span>
           </div>
-          <div class="terminal-line"><span class="terminal-prompt">➜</span> <span class="terminal-cursor"></span></div>
+          <div class="terminal-body">
+            <div class="terminal-line"><span class="terminal-prompt">➜</span> <span class="terminal-command">ls -l
+                /socials</span></div>
+            <div class="terminal-list">
+              <a href="https://github.com/AlekBlackk" target="_blank" class="terminal-item">
+                <span class="terminal-item__type">link</span>
+                <span class="terminal-item__name">github.tsx</span>
+                <span class="terminal-item__arrow">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.28 1.15-.28 2.35 0 3.5-.73 1.02-1.08 2.25-1 3.5 0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4">
+                    </path>
+                    <path d="M9 18c-4.51 2-5-2-7-2"></path>
+                  </svg>
+                </span>
+                <span class="terminal-item__value">sadmore</span>
+              </a>
+              <a href="https://t.me/" target="_blank" class="terminal-item">
+                <span class="terminal-item__type">link</span>
+                <span class="terminal-item__name">telegram.tsx</span>
+                <span class="terminal-item__arrow">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                </span>
+                <span class="terminal-item__value">@sadmore</span>
+              </a>
+            </div>
+            <div class="terminal-line"><span class="terminal-prompt">➜</span> <span class="terminal-cursor"></span></div>
+          </div>
+        </div>
+
+        <!-- NEW: Visual Centerpiece -->
+        <div class="contacts-visual">
+          <div class="visual-glow"></div>
+          <canvas id="contacts-canvas"></canvas>
+          <div class="visual-labels">
+            <span class="visual-label" style="--d: 0s; --top: 10%; --left: 10%;">React</span>
+            <span class="visual-label" style="--d: 1s; --top: 80%; --left: 15%;">Node.js</span>
+            <span class="visual-label" style="--d: 2s; --top: 20%; --left: 80%;">TypeScript</span>
+            <span class="visual-label" style="--d: 3s; --top: 75%; --left: 85%;">Next.js</span>
+          </div>
         </div>
       </div>
     </section>

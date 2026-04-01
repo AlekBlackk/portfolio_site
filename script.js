@@ -903,4 +903,143 @@
     initParticles();
     animateBackground();
   }
+
+  // --- 3D Sphere Interactive Visual ---
+  const contactsCanvas = document.getElementById('contacts-canvas');
+  if (contactsCanvas) {
+    const ctx = contactsCanvas.getContext('2d');
+    let points = [];
+    let angleX = 0;
+    let angleY = 0;
+    let targetAngleX = 0;
+    let targetAngleY = 0;
+    const count = 120;
+    const radius = 140;
+
+    class Point3D {
+      constructor(theta, phi) {
+        this.theta = theta;
+        this.phi = phi;
+        this.x = radius * Math.sin(phi) * Math.cos(theta);
+        this.y = radius * Math.sin(phi) * Math.sin(theta);
+        this.z = radius * Math.cos(phi);
+      }
+
+      project(ax, ay) {
+        // Rotate
+        let x = this.x;
+        let y = this.y;
+        let z = this.z;
+
+        // X Rotation
+        let cosAX = Math.cos(ax);
+        let sinAX = Math.sin(ax);
+        let y1 = y * cosAX - z * sinAX;
+        let z1 = y * sinAX + z * cosAX;
+
+        // Y Rotation
+        let cosAY = Math.cos(ay);
+        let sinAY = Math.sin(ay);
+        let x2 = x * cosAY + z1 * sinAY;
+        let z2 = -x * sinAY + z1 * cosAY;
+
+        // Perspective
+        const perspective = 350;
+        const scale = perspective / (perspective + z2);
+        const px = x2 * scale + contactsCanvas.width / 2;
+        const py = y1 * scale + contactsCanvas.height / 2;
+
+        return { x: px, y: py, z: z2, scale };
+      }
+    }
+
+    function initPoints() {
+      points = [];
+      for (let i = 0; i < count; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos((Math.random() * 2) - 1);
+        points.push(new Point3D(theta, phi));
+      }
+    }
+
+    function resizeCanvas() {
+      const rect = contactsCanvas.getBoundingClientRect();
+      contactsCanvas.width = rect.width;
+      contactsCanvas.height = rect.height;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    initPoints();
+
+    const targetVisual = document.querySelector('.contacts-visual');
+    if (targetVisual) {
+      window.addEventListener('mousemove', (e) => {
+        const rect = targetVisual.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        // Only react if somewhat near the contacts visual to save performance
+        const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+        if (dist < 600) {
+          targetAngleY = (e.clientX - centerX) * 0.002;
+          targetAngleX = (e.clientY - centerY) * 0.002;
+        }
+      });
+    }
+
+    function animateSphere() {
+      ctx.clearRect(0, 0, contactsCanvas.width, contactsCanvas.height);
+      
+      angleX += (targetAngleX - angleX) * 0.05 + 0.002;
+      angleY += (targetAngleY - angleY) * 0.05 + 0.002;
+
+      const projected = points.map(p => p.project(angleX, angleY));
+      
+      // Sort by depth (painters algorithm)
+      projected.sort((a, b) => b.z - a.z);
+
+      // Draw lines between nearby points
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < projected.length; i++) {
+        for (let j = i + 1; j < projected.length; j++) {
+          const p1 = projected[i];
+          const p2 = projected[j];
+          const d = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+          
+          if (d < 65) {
+            const opacity = (1 - d / 65) * 0.15 * p1.scale;
+            ctx.strokeStyle = `rgba(168, 85, 247, ${opacity})`;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw dots
+      projected.forEach(p => {
+        const size = 1.6 * p.scale;
+        const opacityFront = (p.z + radius) / (2 * radius); 
+        const opacity = Math.max(0.1, opacityFront);
+        
+        ctx.fillStyle = `rgba(168, 85, 247, ${opacity * 0.7 + 0.3})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+        ctx.fill();
+        
+        if (opacityFront > 0.8) {
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = 'rgba(168, 85, 247, 0.4)';
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      });
+
+      requestAnimationFrame(animateSphere);
+    }
+
+    animateSphere();
+  }
 })();
