@@ -107,10 +107,9 @@
     const maxScroll = Math.max(documentHeight - viewportHeight, 0);
     const scrollProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
 
-    // Dynamic focus line: shifts from 30% to 75% of viewport as we scroll
-    // This allows sections near the bottom of the page to be activated 
-    // even if they don't reach the middle of the screen.
-    const focusRatio = 0.3 + (scrollProgress * 0.45);
+    // Keep the focus line at least at the regular section anchor so a tab
+    // click can't scroll a section into view and still leave the previous tab active.
+    const focusRatio = 0.5 + (scrollProgress * 0.25);
     const focusY = scrollY + stickyOffset + (availableViewport * focusRatio);
 
     let activeId = sections[0].id;
