@@ -54,3 +54,28 @@ test('pins floating panels to their current top-left coordinates', () => {
   assert.equal(panel.style.right, 'auto');
   assert.equal(panel.style.bottom, 'auto');
 });
+
+test('builds stable labels for floating panel controls', () => {
+  const { getPanelControlDescriptors } = require('../script.js');
+
+  assert.deepEqual(
+    getPanelControlDescriptors('system-metrics'),
+    [
+      {
+        action: 'hide',
+        label: 'Hide system-metrics panel',
+        testId: 'system-metrics-hide'
+      },
+      {
+        action: 'minimize',
+        label: 'Minimize system-metrics panel',
+        testId: 'system-metrics-minimize'
+      },
+      {
+        action: 'reset',
+        label: 'Reset system-metrics panel position',
+        testId: 'system-metrics-reset'
+      }
+    ]
+  );
+});

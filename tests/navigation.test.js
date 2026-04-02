@@ -138,3 +138,18 @@ test('computes a lower viewport anchor for regular sections when the viewport is
     250
   );
 });
+
+test('maps a minimap click position to a centered document scroll target', () => {
+  const { getMinimapScrollTarget } = require('../script.js');
+
+  assert.equal(
+    getMinimapScrollTarget({
+      clientY: 600,
+      minimapTop: 100,
+      minimapHeight: 1000,
+      documentHeight: 2500,
+      viewportHeight: 1200
+    }),
+    650
+  );
+});

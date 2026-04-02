@@ -91,7 +91,7 @@
       </div>
       <div class="hero__graphics">
         <!-- Floating Terminal -->
-        <div class="floating-panel panel-terminal">
+        <div class="floating-panel panel-terminal" data-panel-id="build-process">
           <div class="panel-header">
             <div class="window-dots"><span></span><span></span><span></span></div>
             <div class="panel-title">build_process.sh</div>
@@ -114,7 +114,7 @@
         </div>
 
         <!-- Floating Stats/Monitor -->
-        <div class="floating-panel panel-stats">
+        <div class="floating-panel panel-stats" data-panel-id="system-metrics">
           <div class="panel-header">
             <div class="window-dots"><span></span><span></span><span></span></div>
             <div class="panel-title">⚙ system_metrics</div>
@@ -386,9 +386,9 @@
         </div>
 
         <!-- NEW: Visual Centerpiece -->
-        <div class="contacts-visual">
+        <div class="contacts-visual" data-testid="contacts-visual" aria-label="Interactive contacts visual">
           <div class="visual-glow"></div>
-          <canvas id="contacts-canvas"></canvas>
+          <canvas id="contacts-canvas" data-testid="contacts-canvas" aria-label="Contacts visual canvas"></canvas>
           <div class="visual-labels">
             <span class="visual-label" style="--d: 0s; --top: 10%; --left: 10%;">React</span>
             <span class="visual-label" style="--d: 1s; --top: 80%; --left: 15%;">Node.js</span>
@@ -420,7 +420,7 @@
     </div>
 
     <div class="status-bar__group">
-      <div class="status-bar__item status-bar__item--interactive" id="restore-panels-btn" style="display: none;">
+      <div class="status-bar__item status-bar__item--interactive" id="restore-panels-btn" data-testid="restore-panels-btn" aria-label="Restore hidden windows" style="display: none;">
         <span class="status-bar__icon">↺</span>
         <span>Restore Windows</span>
       </div>
@@ -455,8 +455,8 @@
   <div class="cursor-ring" data-cursor-ring></div>
 
   <!-- Minimap -->
-  <div class="minimap" id="minimap">
-    <canvas id="minimap-canvas"></canvas>
+  <div class="minimap" id="minimap" data-testid="minimap" aria-label="Page minimap">
+    <canvas id="minimap-canvas" data-testid="minimap-canvas" aria-label="Page minimap canvas"></canvas>
     <div class="minimap-slider" id="minimap-slider"></div>
   </div>
 

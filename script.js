@@ -162,9 +162,63 @@
     return true;
   }
 
+  function getMinimapScrollTarget({
+    clientY,
+    minimapTop,
+    minimapHeight,
+    documentHeight,
+    viewportHeight
+  }) {
+    if (
+      !Number.isFinite(clientY) ||
+      !Number.isFinite(minimapTop) ||
+      !Number.isFinite(minimapHeight) ||
+      minimapHeight <= 0 ||
+      !Number.isFinite(documentHeight) ||
+      !Number.isFinite(viewportHeight)
+    ) {
+      return 0;
+    }
+
+    const relativeY = clientY - minimapTop;
+    const percentage = Math.max(0, Math.min(1, relativeY / minimapHeight));
+    const centeredScrollTarget =
+      (percentage * documentHeight) - (viewportHeight / 2);
+
+    return Math.max(Math.round(centeredScrollTarget), 0);
+  }
+
+  function getPanelControlDescriptors(panelId) {
+    const safePanelId = String(panelId || 'panel')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'panel';
+
+    return [
+      {
+        action: 'hide',
+        label: `Hide ${safePanelId} panel`,
+        testId: `${safePanelId}-hide`
+      },
+      {
+        action: 'minimize',
+        label: `Minimize ${safePanelId} panel`,
+        testId: `${safePanelId}-minimize`
+      },
+      {
+        action: 'reset',
+        label: `Reset ${safePanelId} panel position`,
+        testId: `${safePanelId}-reset`
+      }
+    ];
+  }
+
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
       getActiveSectionId,
+      getMinimapScrollTarget,
+      getPanelControlDescriptors,
       getSectionViewportTop,
       getScrollSpacerHeight,
       getScrollTargetY,
@@ -596,27 +650,62 @@
 
     const scrollPageToMinimapY = (y) => {
       const rect = minimap.getBoundingClientRect();
-      const relativeY = y - rect.top;
-      const percentage = Math.max(0, Math.min(1, relativeY / rect.height));
-      const targetScroll = percentage * document.documentElement.scrollHeight - (window.innerHeight / 2);
-      window.scrollTo({ top: targetScroll, behavior: isDraggingMinimap ? 'auto' : 'smooth' });
+      const targetScroll = getMinimapScrollTarget({
+        clientY: y,
+        minimapTop: rect.top,
+        minimapHeight: rect.height,
+        documentHeight: document.documentElement.scrollHeight,
+        viewportHeight: window.innerHeight
+      });
+
+      window.scrollTo({
+        top: targetScroll,
+        behavior: isDraggingMinimap ? 'auto' : 'smooth'
+      });
     };
 
-    minimap.addEventListener('mousedown', (e) => {
-      isDraggingMinimap = true;
-      scrollPageToMinimapY(e.clientY);
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (isDraggingMinimap) {
-        e.preventDefault(); // Prevent text selection
-        scrollPageToMinimapY(e.clientY);
-      }
-    });
-
-    window.addEventListener('mouseup', () => {
+    const endMinimapInteraction = () => {
       isDraggingMinimap = false;
-    });
+    };
+
+    if (window.PointerEvent) {
+      minimap.addEventListener('pointerdown', (e) => {
+        if (typeof e.button === 'number' && e.button !== 0) {
+          return;
+        }
+
+        isDraggingMinimap = true;
+        minimap.setPointerCapture?.(e.pointerId);
+        scrollPageToMinimapY(e.clientY);
+      });
+
+      minimap.addEventListener('pointermove', (e) => {
+        if (!isDraggingMinimap) {
+          return;
+        }
+
+        e.preventDefault();
+        scrollPageToMinimapY(e.clientY);
+      });
+
+      minimap.addEventListener('pointerup', endMinimapInteraction);
+      minimap.addEventListener('pointercancel', endMinimapInteraction);
+      window.addEventListener('pointerup', endMinimapInteraction);
+    } else {
+      minimap.addEventListener('mousedown', (e) => {
+        isDraggingMinimap = true;
+        scrollPageToMinimapY(e.clientY);
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (isDraggingMinimap) {
+          e.preventDefault();
+          scrollPageToMinimapY(e.clientY);
+        }
+      });
+
+      window.addEventListener('mouseup', endMinimapInteraction);
+    }
   }
 
   // --- Floating Panels Interactivity ---
@@ -727,6 +816,28 @@
 
     // Functional Buttons (Updated)
     const dots = panel.querySelectorAll('.window-dots span');
+    const panelId = panel.dataset.panelId || 'panel';
+    const controlDescriptors = getPanelControlDescriptors(panelId);
+
+    dots.forEach((dot, index) => {
+      const descriptor = controlDescriptors[index];
+
+      if (!descriptor) {
+        return;
+      }
+
+      dot.setAttribute('role', 'button');
+      dot.setAttribute('tabindex', '0');
+      dot.setAttribute('aria-label', descriptor.label);
+      dot.setAttribute('title', descriptor.label);
+      dot.dataset.testid = descriptor.testId;
+      dot.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          dot.click();
+        }
+      });
+    });
 
     if (dots.length >= 3) {
       // Red: Close (Hide)
@@ -974,17 +1085,27 @@
 
     const targetVisual = document.querySelector('.contacts-visual');
     if (targetVisual) {
-      window.addEventListener('mousemove', (e) => {
+      const updateSphereTarget = (clientX, clientY) => {
         const rect = targetVisual.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
-        
+
         // Only react if somewhat near the contacts visual to save performance
-        const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+        const dist = Math.hypot(clientX - centerX, clientY - centerY);
         if (dist < 600) {
-          targetAngleY = (e.clientX - centerX) * 0.002;
-          targetAngleX = (e.clientY - centerY) * 0.002;
+          targetAngleY = (clientX - centerX) * 0.002;
+          targetAngleX = (clientY - centerY) * 0.002;
         }
+      };
+
+      window.addEventListener('mousemove', (e) => {
+        updateSphereTarget(e.clientX, e.clientY);
+      });
+      targetVisual.addEventListener('pointermove', (e) => {
+        updateSphereTarget(e.clientX, e.clientY);
+      });
+      targetVisual.addEventListener('pointerdown', (e) => {
+        updateSphereTarget(e.clientX, e.clientY);
       });
     }
 
