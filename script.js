@@ -881,24 +881,126 @@
         panel.style.transform = 'translate3d(0, 0, 0)';
       });
     }
-    // --- Dynamic Metrics Update ---
-    const cpuVal = document.querySelector('.panel-stats .metric-group:nth-child(1) .metric-val');
-    const cpuBar = document.querySelector('.panel-stats .metric-group:nth-child(1) .metric-fill');
-    const memVal = document.querySelector('.panel-stats .metric-group:nth-child(2) .metric-val');
-    const memBar = document.querySelector('.panel-stats .metric-group:nth-child(2) .metric-fill');
-
-    if (cpuVal && memVal) {
-      setInterval(() => {
-        const cpu = 30 + Math.floor(Math.random() * 25);
-        const mem = (2.4 + Math.random() * 0.8).toFixed(1);
-
-        cpuVal.textContent = `${cpu}%`;
-        cpuBar.style.width = `${cpu}%`;
-        memVal.textContent = `${mem}/8 GB`;
-        memBar.style.width = `${(mem / 8) * 100}%`;
-      }, 3000);
-    }
   });
+
+  // --- Dynamic Metrics System ---
+  function initLiveMetrics() {
+    const statsPanel = document.querySelector('.panel-stats');
+    if (!statsPanel) return;
+
+    const cpuVal = statsPanel.querySelector('.metric-group:nth-child(1) .metric-val');
+    const cpuBar = statsPanel.querySelector('.metric-group:nth-child(1) .metric-fill');
+    const memVal = statsPanel.querySelector('.metric-group:nth-child(2) .metric-val');
+    const memBar = statsPanel.querySelector('.metric-group:nth-child(2) .metric-fill');
+    const netVal = statsPanel.querySelector('.metric-group:nth-child(3) .metric-val');
+    const netBar = statsPanel.querySelector('.metric-group:nth-child(3) .metric-fill');
+    const pingText = statsPanel.querySelector('.panel-ping');
+
+    // Remove static animations from HTML style attributes to let JS take over
+    [cpuBar, memBar, netBar].forEach(bar => {
+      if (bar) bar.style.animation = 'none';
+    });
+
+    // Update CPU (frequent)
+    setInterval(() => {
+      if (cpuVal && cpuBar) {
+        const val = 15 + Math.floor(Math.random() * 45);
+        cpuVal.textContent = `${val}%`;
+        cpuBar.style.width = `${val}%`;
+      }
+    }, 2000);
+
+    // Update Memory (slow)
+    setInterval(() => {
+      if (memVal && memBar) {
+        const used = (1.8 + Math.random() * 1.2).toFixed(1);
+        memVal.textContent = `${used}/8 GB`;
+        memBar.style.width = `${(used / 8) * 100}%`;
+      }
+    }, 4000);
+
+    // Update Network (sporadic)
+    setInterval(() => {
+      if (netVal && netBar) {
+        const speed = (0.5 + Math.random() * 4).toFixed(1);
+        netVal.textContent = `${speed} MB/s`;
+        netBar.style.width = `${Math.min(speed * 20, 100)}%`;
+      }
+    }, 3000);
+
+    // Update Ping
+    setInterval(() => {
+      if (pingText) {
+        const ping = 8 + Math.floor(Math.random() * 20);
+        const dot = pingText.querySelector('.ping-dot');
+        pingText.innerHTML = '';
+        if (dot) pingText.appendChild(dot);
+        pingText.appendChild(document.createTextNode(` ${ping}ms ping`));
+      }
+    }, 5000);
+  }
+
+  initLiveMetrics();
+
+  // --- Dynamic Terminal Build Animation ---
+  function initTerminalBuild() {
+    const term = document.querySelector('.panel-terminal .term-content');
+    if (!term) return;
+
+    const buildOutput = [
+      { text: " [vite v5.0.0] building for production...", class: "t-dim" },
+      { text: " transforming (34) src/components/Hero.tsx", class: "t-dim" },
+      { text: "✓ 42 modules transformed.", class: "t-success" },
+      { text: "dist/index.html 1.24 kB", class: "t-dim" },
+      { text: "dist/style.css 12.45 kB [optimized]", class: "t-dim" },
+      { text: "dist/script.js 8.12 kB [optimized]", class: "t-dim" },
+      { text: "✓ built in 1.42s", class: "t-success", style: "margin-top: 8px;" }
+    ];
+
+    const firstLine = term.querySelector('.t-line'); // Command line
+    const lastLine = term.lastElementChild; // Cursor line
+    
+    function runCycle() {
+      // Clear output lines
+      while (term.children.length > 2) {
+        term.removeChild(term.children[1]);
+      }
+      
+      let i = 0;
+      function addNextLine() {
+        if (i < buildOutput.length) {
+          const lineData = buildOutput[i];
+          const div = document.createElement('div');
+          div.className = `t-line ${lineData.class || ''}`;
+          if (lineData.style) div.style = lineData.style;
+          div.textContent = lineData.text;
+          div.style.opacity = '0';
+          div.style.transform = 'translateY(5px)';
+          div.style.transition = 'all 0.3s ease';
+          
+          term.insertBefore(div, lastLine);
+          
+          // Trigger animation
+          setTimeout(() => {
+            div.style.opacity = '1';
+            div.style.transform = 'translateY(0)';
+          }, 50);
+
+          i++;
+          setTimeout(addNextLine, 300 + Math.random() * 800);
+        } else {
+          // Finished cycle, wait then restart
+          setTimeout(runCycle, 15000);
+        }
+      }
+
+      setTimeout(addNextLine, 1000);
+    }
+
+    runCycle();
+  }
+
+  initTerminalBuild();
 
   // --- Interactive Digital Background Implementation ---
   const canvas = document.getElementById('bg-canvas');
