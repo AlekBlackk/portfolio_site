@@ -1,6 +1,16 @@
 (() => {
   'use strict';
 
+  // --- Visibility Controller ---
+  // Each animation registers pause/resume handlers here.
+  // All loops stop when the tab is hidden and resume when it becomes visible again.
+  const onPause = [];
+  const onResume = [];
+  document.addEventListener('visibilitychange', () => {
+    const handlers = document.hidden ? onPause : onResume;
+    handlers.forEach(fn => fn());
+  });
+
   const LAST_SECTION_BOTTOM_GAP = 80;
   const MAX_REGULAR_SECTION_TOP = 250;
   const MIN_SECTION_TOP_GAP = 24;
@@ -270,7 +280,7 @@
     setTimeout(type, delay);
   }
 
-  type();
+  if (typingEl) type();
 
   // Tab Navigation
   const tabs = Array.from(document.querySelectorAll('.tab'));
@@ -901,46 +911,58 @@
       if (bar) bar.style.animation = 'none';
     });
 
-    // Update CPU (frequent)
-    setInterval(() => {
-      if (cpuVal && cpuBar) {
-        const val = 15 + Math.floor(Math.random() * 45);
-        cpuVal.textContent = `${val}%`;
-        cpuBar.style.width = `${val}%`;
-      }
-    }, 2000);
+    const ids = [];
 
-    // Update Memory (slow)
-    setInterval(() => {
-      if (memVal && memBar) {
-        const used = (1.8 + Math.random() * 1.2).toFixed(1);
-        memVal.textContent = `${used}/8 GB`;
-        memBar.style.width = `${(used / 8) * 100}%`;
-      }
-    }, 4000);
+    function start() {
+      ids.push(setInterval(() => {
+        if (cpuVal && cpuBar) {
+          const val = 15 + Math.floor(Math.random() * 45);
+          cpuVal.textContent = `${val}%`;
+          cpuBar.style.width = `${val}%`;
+        }
+      }, 2000));
 
-    // Update Network (sporadic)
-    setInterval(() => {
-      if (netVal && netBar) {
-        const speed = (0.5 + Math.random() * 4).toFixed(1);
-        netVal.textContent = `${speed} MB/s`;
-        netBar.style.width = `${Math.min(speed * 20, 100)}%`;
-      }
-    }, 3000);
+      ids.push(setInterval(() => {
+        if (memVal && memBar) {
+          const used = (1.8 + Math.random() * 1.2).toFixed(1);
+          memVal.textContent = `${used}/8 GB`;
+          memBar.style.width = `${(used / 8) * 100}%`;
+        }
+      }, 4000));
 
-    // Update Ping
-    setInterval(() => {
-      if (pingText) {
-        const ping = 8 + Math.floor(Math.random() * 20);
-        const dot = pingText.querySelector('.ping-dot');
-        pingText.innerHTML = '';
-        if (dot) pingText.appendChild(dot);
-        pingText.appendChild(document.createTextNode(` ${ping}ms ping`));
-      }
-    }, 5000);
+      ids.push(setInterval(() => {
+        if (netVal && netBar) {
+          const speed = (0.5 + Math.random() * 4).toFixed(1);
+          netVal.textContent = `${speed} MB/s`;
+          netBar.style.width = `${Math.min(speed * 20, 100)}%`;
+        }
+      }, 3000));
+
+      ids.push(setInterval(() => {
+        if (pingText) {
+          const ping = 8 + Math.floor(Math.random() * 20);
+          const dot = pingText.querySelector('.ping-dot');
+          pingText.innerHTML = '';
+          if (dot) pingText.appendChild(dot);
+          pingText.appendChild(document.createTextNode(` ${ping}ms ping`));
+        }
+      }, 5000));
+    }
+
+    function stop() {
+      ids.forEach(clearInterval);
+      ids.length = 0;
+    }
+
+    start();
+    return { start, stop };
   }
 
-  initLiveMetrics();
+  const metrics = initLiveMetrics();
+  if (metrics) {
+    onPause.push(metrics.stop);
+    onResume.push(metrics.start);
+  }
 
   // --- Dynamic Terminal Build Animation ---
   function initTerminalBuild() {
@@ -957,7 +979,6 @@
       { text: "✓ built in 1.42s", class: "t-success", style: "margin-top: 8px;" }
     ];
 
-    const firstLine = term.querySelector('.t-line'); // Command line
     const lastLine = term.lastElementChild; // Cursor line
     
     function runCycle() {
@@ -972,8 +993,8 @@
           const lineData = buildOutput[i];
           const div = document.createElement('div');
           div.className = `t-line ${lineData.class || ''}`;
-          if (lineData.style) div.style = lineData.style;
           div.textContent = lineData.text;
+          if (lineData.style) div.style.cssText = lineData.style;
           div.style.opacity = '0';
           div.style.transform = 'translateY(5px)';
           div.style.transition = 'all 0.3s ease';
@@ -1084,9 +1105,11 @@
       }
     }
 
+    let bgRafId = null;
+
     function animateBackground() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.update();
@@ -1106,12 +1129,15 @@
           ctx.stroke();
         }
       }
-      requestAnimationFrame(animateBackground);
+      bgRafId = requestAnimationFrame(animateBackground);
     }
 
     window.addEventListener('resize', () => {
       initParticles();
     });
+
+    onPause.push(() => cancelAnimationFrame(bgRafId));
+    onResume.push(() => { animateBackground(); });
 
     initParticles();
     animateBackground();
@@ -1211,14 +1237,16 @@
       });
     }
 
+    let sphereRafId = null;
+
     function animateSphere() {
       ctx.clearRect(0, 0, contactsCanvas.width, contactsCanvas.height);
-      
+
       angleX += (targetAngleX - angleX) * 0.05 + 0.002;
       angleY += (targetAngleY - angleY) * 0.05 + 0.002;
 
       const projected = points.map(p => p.project(angleX, angleY));
-      
+
       // Sort by depth (painters algorithm)
       projected.sort((a, b) => b.z - a.z);
 
@@ -1229,7 +1257,7 @@
           const p1 = projected[i];
           const p2 = projected[j];
           const d = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-          
+
           if (d < 65) {
             const opacity = (1 - d / 65) * 0.15 * p1.scale;
             ctx.strokeStyle = `rgba(168, 85, 247, ${opacity})`;
@@ -1244,14 +1272,14 @@
       // Draw dots
       projected.forEach(p => {
         const size = 1.6 * p.scale;
-        const opacityFront = (p.z + radius) / (2 * radius); 
+        const opacityFront = (p.z + radius) / (2 * radius);
         const opacity = Math.max(0.1, opacityFront);
-        
+
         ctx.fillStyle = `rgba(168, 85, 247, ${opacity * 0.7 + 0.3})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
         ctx.fill();
-        
+
         if (opacityFront > 0.8) {
           ctx.shadowBlur = 8;
           ctx.shadowColor = 'rgba(168, 85, 247, 0.4)';
@@ -1260,8 +1288,11 @@
         }
       });
 
-      requestAnimationFrame(animateSphere);
+      sphereRafId = requestAnimationFrame(animateSphere);
     }
+
+    onPause.push(() => cancelAnimationFrame(sphereRafId));
+    onResume.push(() => { animateSphere(); });
 
     animateSphere();
   }
