@@ -6,10 +6,6 @@
   // All loops stop when the tab is hidden and resume when it becomes visible again.
   const onPause = [];
   const onResume = [];
-  document.addEventListener('visibilitychange', () => {
-    const handlers = document.hidden ? onPause : onResume;
-    handlers.forEach(fn => fn());
-  });
 
   const LAST_SECTION_BOTTOM_GAP = 80;
   const MAX_REGULAR_SECTION_TOP = 250;
@@ -239,6 +235,11 @@
   if (typeof document === 'undefined') {
     return;
   }
+
+  document.addEventListener('visibilitychange', () => {
+    const handlers = document.hidden ? onPause : onResume;
+    handlers.forEach(fn => fn());
+  });
 
   // Typing Effect
   const roles = [
