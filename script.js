@@ -291,6 +291,28 @@
   let isTabScrolling = false;
   let scrollTimeout = null;
 
+  // Status bar "Ln/Col" mimics an editor cursor position: Ln tracks scroll
+  // progress through the page, Col tracks which section is active.
+  const statusPositionEl = document.querySelector('[data-testid="status-ln-col"]');
+  const sectionOrder = tabs.map(tab => tab.dataset.target);
+  let currentSectionId = sections[0]?.id || null;
+
+  function renderStatusPosition(progress) {
+    if (!statusPositionEl) return;
+
+    let currentProgress = progress;
+    if (typeof currentProgress !== 'number') {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      currentProgress = scrollable > 0
+        ? Math.min(Math.max(window.scrollY / scrollable, 0), 1)
+        : 0;
+    }
+
+    const line = Math.round(currentProgress * 99) + 1;
+    const col = Math.max(sectionOrder.indexOf(currentSectionId), 0) + 1;
+    statusPositionEl.textContent = `Ln ${line}, Col ${col}`;
+  }
+
   function setActiveTab(activeId) {
     tabs.forEach(tab => {
       const isActive = tab.dataset.target === activeId;
@@ -301,6 +323,8 @@
         tab.removeAttribute('aria-current');
       }
     });
+    currentSectionId = activeId;
+    renderStatusPosition();
   }
 
   function getStickyOffset() {
@@ -443,6 +467,7 @@
         ? Math.min(Math.max(window.scrollY / scrollable, 0), 1)
         : 0;
       scrollProgressBar.style.transform = `scaleX(${progress})`;
+      renderStatusPosition(progress);
     };
 
     const requestProgressUpdate = () => {
