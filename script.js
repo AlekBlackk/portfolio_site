@@ -430,6 +430,31 @@
   syncLayoutMetrics();
   syncActiveTabFromScroll();
 
+  // --- Scroll Progress Bar ---
+  // Visible on all breakpoints, unlike the minimap which hides under 768px.
+  const scrollProgressBar = document.querySelector('.scroll-progress__bar');
+  if (scrollProgressBar) {
+    let progressRafId = null;
+
+    const updateScrollProgress = () => {
+      progressRafId = null;
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollable > 0
+        ? Math.min(Math.max(window.scrollY / scrollable, 0), 1)
+        : 0;
+      scrollProgressBar.style.transform = `scaleX(${progress})`;
+    };
+
+    const requestProgressUpdate = () => {
+      if (progressRafId) return;
+      progressRafId = requestAnimationFrame(updateScrollProgress);
+    };
+
+    window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+    window.addEventListener('resize', requestProgressUpdate);
+    updateScrollProgress();
+  }
+
   // Card Scroll Reveal
   const cards = document.querySelectorAll('.card');
 
@@ -493,6 +518,10 @@
   const cursorRing = document.querySelector('[data-cursor-ring]');
 
   if (spotlight && glow && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    // Gate the CSS `cursor: none` rule behind this class so the native
+    // cursor stays visible if this script never runs (no silent invisible cursor).
+    document.documentElement.classList.add('has-custom-cursor');
+
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let glowX = mouseX;
@@ -530,11 +559,25 @@
       if (cursorRing) cursorRing.classList.remove('is-active');
     });
 
+    // Readable text blocks get a thin caret instead of the round ring,
+    // so it's clear the content is text to read/select, not something to click.
+    const textElements = document.querySelectorAll('.code-file__body, .hero__code, .terminal-body, .panel-body');
+    textElements.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        if (cursorRing) cursorRing.classList.add('cursor-text');
+        if (cursorDot) cursorDot.classList.add('cursor-text');
+      });
+      el.addEventListener('mouseleave', () => {
+        if (cursorRing) cursorRing.classList.remove('cursor-text');
+        if (cursorDot) cursorDot.classList.remove('cursor-text');
+      });
+    });
+
     const interactiveElements = document.querySelectorAll('a, button, .tab, .window-btn, .card');
     interactiveElements.forEach(el => {
       el.addEventListener('mouseenter', () => {
-        if (cursorRing) cursorRing.classList.add('cursor-hover');
-        if (cursorDot) cursorDot.classList.add('cursor-hover');
+        if (cursorRing) { cursorRing.classList.add('cursor-hover'); cursorRing.classList.remove('cursor-text'); }
+        if (cursorDot) { cursorDot.classList.add('cursor-hover'); cursorDot.classList.remove('cursor-text'); }
       });
       el.addEventListener('mouseleave', () => {
         if (cursorRing) cursorRing.classList.remove('cursor-hover');
@@ -652,12 +695,29 @@
       });
     };
 
+    let isDraggingMinimap = false;
+    // Layout metrics stay constant for the whole drag, so they are read once on
+    // pointerdown. Re-reading them per frame forced a reflow immediately after
+    // each scroll write.
+    let dragMetrics = null;
+
+    const readMinimapMetrics = () => {
+      const rect = minimap.getBoundingClientRect();
+
+      return {
+        minimapTop: rect.top,
+        minimapHeight: rect.height,
+        documentHeight: document.documentElement.scrollHeight,
+        viewportHeight: window.innerHeight
+      };
+    };
+
     const updateSlider = () => {
       if (window.innerWidth <= 768) return;
 
-      const docHeight = document.documentElement.scrollHeight;
-      const mapHeight = minimap.offsetHeight;
-      const viewportHeight = window.innerHeight;
+      const docHeight = dragMetrics ? dragMetrics.documentHeight : document.documentElement.scrollHeight;
+      const mapHeight = dragMetrics ? dragMetrics.minimapHeight : minimap.offsetHeight;
+      const viewportHeight = dragMetrics ? dragMetrics.viewportHeight : window.innerHeight;
 
       const scrollY = window.scrollY;
       const scale = mapHeight / docHeight;
@@ -684,26 +744,75 @@
       updateSlider();
     }, 200);
 
-    let isDraggingMinimap = false;
-
-    const scrollPageToMinimapY = (y) => {
-      const rect = minimap.getBoundingClientRect();
+    // Behavior is explicit at each call site, not inferred from isDraggingMinimap:
+    // a bare click (down, no move, up) should animate smoothly to its target,
+    // while continuous drag tracking must jump instantly on every frame — an
+    // animated scroll can never keep pace with a moving pointer, so it would
+    // permanently lag behind. Since isDraggingMinimap was already true by the
+    // time the initial pointerdown call ran, plain clicks used to get the same
+    // instant jump as dragging, which read as an abrupt, jarring cut.
+    const scrollPageToMinimapY = (y, behavior) => {
       const targetScroll = getMinimapScrollTarget({
         clientY: y,
-        minimapTop: rect.top,
-        minimapHeight: rect.height,
-        documentHeight: document.documentElement.scrollHeight,
-        viewportHeight: window.innerHeight
+        ...(dragMetrics ?? readMinimapMetrics())
       });
 
-      window.scrollTo({
-        top: targetScroll,
-        behavior: isDraggingMinimap ? 'auto' : 'smooth'
-      });
+      window.scrollTo({ top: targetScroll, behavior });
     };
+
+    // Coalesce drag input to one scrollTo per animation frame — pointermove
+    // fires far more often than the page can actually repaint, and an
+    // uncapped scrollTo per event was forcing a layout on every single one.
+    let pendingMinimapY = null;
+    let minimapDragRafId = null;
+
+    const flushMinimapDrag = () => {
+      minimapDragRafId = null;
+      if (pendingMinimapY !== null) {
+        scrollPageToMinimapY(pendingMinimapY, 'instant');
+        pendingMinimapY = null;
+      }
+    };
+
+    const requestMinimapScroll = (y) => {
+      pendingMinimapY = y;
+      if (minimapDragRafId) return;
+      minimapDragRafId = requestAnimationFrame(flushMinimapDrag);
+    };
+
+    // A "click" and the start of a "drag" are the same pointerdown event —
+    // the only difference is whether the pointer actually moves afterward.
+    // Real pointers never sit perfectly still between down and up (a few
+    // px of hand tremor is normal), so reacting to any pointermove at all
+    // made the smooth click-scroll get cut off by an instant jump at random,
+    // depending on whether that particular click happened to jitter.
+    // Requiring a small movement threshold before switching to instant
+    // per-frame tracking lets genuine clicks always finish their smooth
+    // animation, while real drags still track the cursor exactly.
+    const DRAG_THRESHOLD_PX = 4;
+    let dragStartY = null;
+    let hasExceededDragThreshold = false;
 
     const endMinimapInteraction = () => {
       isDraggingMinimap = false;
+      dragMetrics = null;
+      dragStartY = null;
+      hasExceededDragThreshold = false;
+      pendingMinimapY = null;
+      if (minimapDragRafId) {
+        cancelAnimationFrame(minimapDragRafId);
+        minimapDragRafId = null;
+      }
+    };
+
+    const handleMinimapMove = (clientY) => {
+      if (!hasExceededDragThreshold) {
+        if (Math.abs(clientY - dragStartY) < DRAG_THRESHOLD_PX) {
+          return;
+        }
+        hasExceededDragThreshold = true;
+      }
+      requestMinimapScroll(clientY);
     };
 
     if (window.PointerEvent) {
@@ -713,8 +822,11 @@
         }
 
         isDraggingMinimap = true;
+        dragMetrics = readMinimapMetrics();
+        dragStartY = e.clientY;
+        hasExceededDragThreshold = false;
         minimap.setPointerCapture?.(e.pointerId);
-        scrollPageToMinimapY(e.clientY);
+        scrollPageToMinimapY(e.clientY, 'smooth');
       });
 
       minimap.addEventListener('pointermove', (e) => {
@@ -723,7 +835,7 @@
         }
 
         e.preventDefault();
-        scrollPageToMinimapY(e.clientY);
+        handleMinimapMove(e.clientY);
       });
 
       minimap.addEventListener('pointerup', endMinimapInteraction);
@@ -732,13 +844,16 @@
     } else {
       minimap.addEventListener('mousedown', (e) => {
         isDraggingMinimap = true;
-        scrollPageToMinimapY(e.clientY);
+        dragMetrics = readMinimapMetrics();
+        dragStartY = e.clientY;
+        hasExceededDragThreshold = false;
+        scrollPageToMinimapY(e.clientY, 'smooth');
       });
 
       window.addEventListener('mousemove', (e) => {
         if (isDraggingMinimap) {
           e.preventDefault();
-          scrollPageToMinimapY(e.clientY);
+          handleMinimapMove(e.clientY);
         }
       });
 
@@ -995,30 +1110,147 @@
   // --- Dynamic Terminal Build Animation ---
   function initTerminalBuild() {
     const term = document.querySelector('.panel-terminal .term-content');
+    const panelTitle = document.querySelector('.panel-terminal .panel-title');
     if (!term) return;
 
-    const buildOutput = [
-      { text: " collecting sources from src/wheels_parser", class: "t-dim" },
-      { text: " compiling parser/telegram_watcher.py", class: "t-dim" },
-      { text: "✓ 42 modules compiled.", class: "t-success" },
-      { text: "dist/wheels_parser.whl 84.2 kB", class: "t-dim" },
-      { text: "tests/ 18 passed [0 failed]", class: "t-dim" },
-      { text: "ruff check 31 files [clean]", class: "t-dim" },
-      { text: "✓ built in 1.42s", class: "t-success", style: "margin-top: 8px;" }
+    const projects = [
+      {
+        title: "wheels_parser/build.sh",
+        path: "~/wheels_parser",
+        cmd: "python -m build --wheel",
+        lines: [
+          { text: " collecting sources from src/wheels_parser", class: "t-dim" },
+          { text: " compiling parser/telegram_watcher.py", class: "t-dim" },
+          { text: "✓ 42 modules compiled.", class: "t-success" },
+          { text: "dist/wheels_parser.whl 84.2 kB", class: "t-dim" },
+          { text: "tests/ 18 passed [0 failed]", class: "t-dim" },
+          { text: "ruff check 31 files [clean]", class: "t-dim" },
+          { text: "✓ built in 1.42s", class: "t-success", style: "margin-top: 8px;" }
+        ]
+      },
+      {
+        title: "screen_recorder/build.sh",
+        path: "~/screen_recorder",
+        cmd: "npm run build",
+        lines: [
+          { text: " bundling src/screen_recorder with esbuild", class: "t-dim" },
+          { text: " packaging electron app (win/mac/linux)", class: "t-dim" },
+          { text: "✓ 128 modules bundled.", class: "t-success" },
+          { text: "dist/screen_recorder-1.4.0.exe 42.6 MB", class: "t-dim" },
+          { text: "tests/ 12 passed [0 failed]", class: "t-dim" },
+          { text: "eslint check 24 files [clean]", class: "t-dim" },
+          { text: "✓ built in 3.87s", class: "t-success", style: "margin-top: 8px;" }
+        ]
+      },
+      {
+        title: "file-manager/run.sh",
+        path: "~/file-manager",
+        cmd: "flask run --host 0.0.0.0",
+        lines: [
+          { text: " collecting sources from src/file_manager", class: "t-dim" },
+          { text: " installing requirements.txt (Flask, Werkzeug)", class: "t-dim" },
+          { text: "✓ app initialized.", class: "t-success" },
+          { text: "routes registered 18", class: "t-dim" },
+          { text: "tests/ 9 passed [0 failed]", class: "t-dim" },
+          { text: "flake8 check 14 files [clean]", class: "t-dim" },
+          { text: "✓ dev server ready in 0.64s", class: "t-success", style: "margin-top: 8px;" }
+        ]
+      },
+      {
+        title: "twitch_bot/run.sh",
+        path: "~/twitch_bot",
+        cmd: "python -m twitch_bot --reconnect",
+        lines: [
+          { text: " connecting to irc.chat.twitch.tv:6697 (TLS)", class: "t-dim" },
+          { text: " authenticating as bot account", class: "t-dim" },
+          { text: "✓ joined 6 channels.", class: "t-success" },
+          { text: "heartbeat interval 30s", class: "t-dim" },
+          { text: "tests/ 11 passed [0 failed]", class: "t-dim" },
+          { text: "ruff check 9 files [clean]", class: "t-dim" },
+          { text: "✓ bot online in 0.92s", class: "t-success", style: "margin-top: 8px;" }
+        ]
+      },
+      {
+        title: "tg_edit_bot/run.sh",
+        path: "~/tg_edit_bot",
+        cmd: "python -m tg_edit_bot",
+        lines: [
+          { text: " loading ComfyUI pipeline (upscale, rembg)", class: "t-dim" },
+          { text: " connecting to Telegram Bot API", class: "t-dim" },
+          { text: "✓ 3 workflows loaded.", class: "t-success" },
+          { text: "queue/ 0 pending [ready]", class: "t-dim" },
+          { text: "tests/ 14 passed [0 failed]", class: "t-dim" },
+          { text: "ruff check 17 files [clean]", class: "t-dim" },
+          { text: "✓ bot ready in 1.15s", class: "t-success", style: "margin-top: 8px;" }
+        ]
+      },
+      {
+        title: "portfolio_site/build.sh",
+        path: "~/portfolio_site",
+        cmd: "npm run build",
+        lines: [
+          { text: " minifying style.css & script.js", class: "t-dim" },
+          { text: " optimizing assets/", class: "t-dim" },
+          { text: "✓ build complete.", class: "t-success" },
+          { text: "dist/ 6 files, 214 kB", class: "t-dim" },
+          { text: "tests/ 7 passed [0 failed]", class: "t-dim" },
+          { text: "eslint check 5 files [clean]", class: "t-dim" },
+          { text: "✓ built in 0.81s", class: "t-success", style: "margin-top: 8px;" }
+        ]
+      },
+      {
+        title: "last_bastion/build.sh",
+        path: "~/last_bastion",
+        cmd: "dotnet build -c Release",
+        lines: [
+          { text: " restoring NuGet packages", class: "t-dim" },
+          { text: " compiling Assembly-CSharp", class: "t-dim" },
+          { text: "✓ build succeeded.", class: "t-success" },
+          { text: "Build/LastBastion.exe 118 MB", class: "t-dim" },
+          { text: "tests/ 21 passed [0 failed]", class: "t-dim" },
+          { text: "warnings 0 [clean]", class: "t-dim" },
+          { text: "✓ built in 4.23s", class: "t-success", style: "margin-top: 8px;" }
+        ]
+      },
+      {
+        title: "sportsbet/run.sh",
+        path: "~/sportsbet",
+        cmd: "python -m sportsbet.analyze",
+        lines: [
+          { text: " fetching odds from 4 bookmakers", class: "t-dim" },
+          { text: " calculating value bets (xG model)", class: "t-dim" },
+          { text: "✓ 217 matches analyzed.", class: "t-success" },
+          { text: "signals/ 6 found [high confidence]", class: "t-dim" },
+          { text: "tests/ 15 passed [0 failed]", class: "t-dim" },
+          { text: "ruff check 22 files [clean]", class: "t-dim" },
+          { text: "✓ analysis done in 2.04s", class: "t-success", style: "margin-top: 8px;" }
+        ]
+      }
     ];
 
+    let projectIndex = 0;
+    const firstLine = term.firstElementChild; // Prompt + command line
     const lastLine = term.lastElementChild; // Cursor line
-    
+
+    function applyProjectHeader(project) {
+      if (panelTitle) panelTitle.textContent = project.title;
+      firstLine.innerHTML = `<span class="t-prompt">${project.path} ➜</span> <span class="t-cmd">${project.cmd}</span>`;
+      lastLine.innerHTML = `<span class="t-prompt">${project.path} ➜</span><span class="t-cursor"></span>`;
+    }
+
     function runCycle() {
+      const project = projects[projectIndex];
+      applyProjectHeader(project);
+
       // Clear output lines
       while (term.children.length > 2) {
         term.removeChild(term.children[1]);
       }
-      
+
       let i = 0;
       function addNextLine() {
-        if (i < buildOutput.length) {
-          const lineData = buildOutput[i];
+        if (i < project.lines.length) {
+          const lineData = project.lines[i];
           const div = document.createElement('div');
           div.className = `t-line ${lineData.class || ''}`;
           div.textContent = lineData.text;
@@ -1026,9 +1258,9 @@
           div.style.opacity = '0';
           div.style.transform = 'translateY(5px)';
           div.style.transition = 'all 0.3s ease';
-          
+
           term.insertBefore(div, lastLine);
-          
+
           // Trigger animation
           setTimeout(() => {
             div.style.opacity = '1';
@@ -1038,7 +1270,8 @@
           i++;
           setTimeout(addNextLine, 300 + Math.random() * 800);
         } else {
-          // Finished cycle, wait then restart
+          // Finished cycle, advance to next project, wait then restart
+          projectIndex = (projectIndex + 1) % projects.length;
           setTimeout(runCycle, 15000);
         }
       }

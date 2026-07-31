@@ -21,7 +21,7 @@
   --hologram-line: rgba(168, 85, 247, 0.4);
   --hologram-glow: rgba(168, 85, 247, 0.6);
   --hologram-accent: rgba(255, 255, 255, 0.2);
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --section-pad-y: clamp(64px, 8vw, 112px);
 }
 
@@ -864,7 +864,7 @@ button:focus-visible,
   margin-right: 18px;
   text-align: right;
   font-size: 12px;
-  color: #454560;
+  color: #7579b0;
   border-right: 1px solid rgba(255, 255, 255, 0.045);
   user-select: none;
   transition: color 0.15s ease;
@@ -1235,6 +1235,35 @@ svg.card__icon {
   border-color: color-mix(in srgb, var(--card-color, var(--accent)) 30%, transparent);
 }
 
+.card__cta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.7;
+  transition: opacity 0.3s ease, color 0.3s ease, gap 0.3s ease, border-color 0.3s ease;
+}
+
+.card__cta svg {
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.card:hover .card__cta {
+  opacity: 1;
+  gap: 10px;
+  color: var(--card-color, var(--accent-light));
+  border-color: color-mix(in srgb, var(--card-color, var(--accent)) 30%, transparent);
+}
+
+.card:hover .card__cta svg {
+  transform: translateX(3px);
+}
+
 /* ── Contacts Section ── */
 .contacts {
   padding: var(--section-pad-y) 40px;
@@ -1583,6 +1612,28 @@ svg.card__icon {
   }
 }
 
+/* ── Scroll Progress ── */
+.scroll-progress {
+  position: fixed;
+  top: var(--sticky-offset);
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  z-index: 98;
+  pointer-events: none;
+}
+
+.scroll-progress__bar {
+  height: 100%;
+  width: 100%;
+  transform-origin: left;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, var(--accent), var(--string-green));
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+  will-change: transform;
+}
+
 /* ── Minimap ── */
 .minimap {
   position: fixed;
@@ -1765,7 +1816,7 @@ body {
     opacity: 1;
   }
 
-  * {
+  html.has-custom-cursor * {
     cursor: none !important;
   }
 
@@ -1809,6 +1860,20 @@ body {
   .cursor-dot.cursor-hover {
     width: 0;
     height: 0;
+    opacity: 0;
+  }
+
+  /* Text-hover state: thin caret instead of ring, signals selectable text */
+  .cursor-ring.cursor-text {
+    width: 2px;
+    height: 22px;
+    border-radius: 1px;
+    border: none;
+    background: var(--accent-light);
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+  }
+
+  .cursor-dot.cursor-text {
     opacity: 0;
   }
 }

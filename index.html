@@ -9,6 +9,9 @@
   <meta property="og:title" content="sadmore — portfolio">
   <meta property="og:description" content="AI Product Builder / Vibe Coder. Автоматизация, AI-инструменты, пользовательские продукты на Python, JavaScript и C#.">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="sadmore — portfolio">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#0a0a0f">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,6 +52,10 @@
       <span class="tab__label">contacts.js</span>
     </button>
   </nav>
+
+  <div class="scroll-progress" data-testid="scroll-progress" aria-hidden="true">
+    <div class="scroll-progress__bar"></div>
+  </div>
 
   <!-- Main Content -->
   <main class="main">
@@ -236,13 +243,13 @@
       </div>
       <div class="projects__grid">
 
-        <a href="https://github.com/AlekBlackk/wheels_parser" target="_blank" rel="noopener" class="card" style="animation-delay: 0s; --card-color: #4ade80;">
+        <a href="https://github.com/AlekBlackk/wheels_parser" target="_blank" rel="noopener" class="card" style="animation-delay: 0s; --card-color: #34d399;">
           <div class="card__top">
             <div class="card__dots"><span></span><span></span><span></span></div>
             <div class="card__file">wheels_parser.py</div>
           </div>
           <div class="card__preview"
-            style="--preview-bg: linear-gradient(135deg, rgba(74, 222, 128, 0.15), rgba(74, 222, 128, 0.05));">
+            style="--preview-bg: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(52, 211, 153, 0.05));">
             <div class="card__preview-bg"></div>
             <!-- колесо фортуны -->
             <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
@@ -257,20 +264,24 @@
             <div class="card__title">wheels_parser</div>
             <div class="card__desc">Парсер фрибет-колёс BetBoom. Мониторит Telegram-каналы стримеров и вытаскивает ссылки в реальном времени.</div>
             <div class="card__tags">
-              <span class="tag" style="border-style: dashed;">Python</span>
-              <span class="tag" style="border-style: dashed;">Parser</span>
+              <span class="tag">Python</span>
+              <span class="tag">Parser</span>
+            </div>
+            <div class="card__cta">
+              <span>Смотреть код</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </div>
           </div>
           <div class="card__glow"></div>
         </a>
 
-        <a href="https://github.com/AlekBlackk/screen_recorder" target="_blank" rel="noopener" class="card" style="animation-delay: 0.1s; --card-color: #2dd4bf;">
+        <a href="https://github.com/AlekBlackk/screen_recorder" target="_blank" rel="noopener" class="card" style="animation-delay: 0.1s; --card-color: #60a5fa;">
           <div class="card__top">
             <div class="card__dots"><span></span><span></span><span></span></div>
             <div class="card__file">screen_recorder.js</div>
           </div>
           <div class="card__preview"
-            style="--preview-bg: linear-gradient(135deg, rgba(45, 212, 191, 0.15), rgba(45, 212, 191, 0.05));">
+            style="--preview-bg: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(96, 165, 250, 0.05));">
             <div class="card__preview-bg"></div>
             <!-- видеокамера с точкой записи -->
             <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
@@ -284,20 +295,24 @@
             <div class="card__title">screen_recorder</div>
             <div class="card__desc">Приложение для записи экрана с кольцевым буфером, горячими клавишами, редактором видео и захватом трансляций.</div>
             <div class="card__tags">
-              <span class="tag" style="border-style: dashed;">JavaScript</span>
-              <span class="tag" style="border-style: dashed;">Desktop</span>
+              <span class="tag">JavaScript</span>
+              <span class="tag">Desktop</span>
+            </div>
+            <div class="card__cta">
+              <span>Смотреть код</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </div>
           </div>
           <div class="card__glow"></div>
         </a>
 
-        <a href="https://github.com/AlekBlackk/file-manager" target="_blank" rel="noopener" class="card" style="animation-delay: 0.2s; --card-color: #f472b6;">
+        <a href="https://github.com/AlekBlackk/file-manager" target="_blank" rel="noopener" class="card" style="animation-delay: 0.2s; --card-color: #a855f7;">
           <div class="card__top">
             <div class="card__dots"><span></span><span></span><span></span></div>
             <div class="card__file">file_manager.py</div>
           </div>
           <div class="card__preview"
-            style="--preview-bg: linear-gradient(135deg, rgba(244, 114, 182, 0.15), rgba(244, 114, 182, 0.05));">
+            style="--preview-bg: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(168, 85, 247, 0.05));">
             <div class="card__preview-bg"></div>
             <!-- папка с загрузкой файла -->
             <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
@@ -310,20 +325,24 @@
             <div class="card__title">file-manager</div>
             <div class="card__desc">Лёгкий веб-файловый менеджер на Flask: загрузка, организация, просмотр, скачивание файлов и работа с корзиной.</div>
             <div class="card__tags">
-              <span class="tag" style="border-style: dashed;">Flask</span>
-              <span class="tag" style="border-style: dashed;">Web</span>
+              <span class="tag">Flask</span>
+              <span class="tag">Web</span>
+            </div>
+            <div class="card__cta">
+              <span>Смотреть код</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </div>
           </div>
           <div class="card__glow"></div>
         </a>
 
-        <a href="https://github.com/AlekBlackk/twitch_bot" target="_blank" rel="noopener" class="card" style="animation-delay: 0.3s; --card-color: #a855f7;">
+        <a href="https://github.com/AlekBlackk/twitch_bot" target="_blank" rel="noopener" class="card" style="animation-delay: 0.3s; --card-color: #f59e0b;">
           <div class="card__top">
             <div class="card__dots"><span></span><span></span><span></span></div>
             <div class="card__file">twitch_bot.py</div>
           </div>
           <div class="card__preview"
-            style="--preview-bg: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(168, 85, 247, 0.05));">
+            style="--preview-bg: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));">
             <div class="card__preview-bg"></div>
             <!-- логотип Twitch -->
             <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
@@ -336,20 +355,24 @@
             <div class="card__title">twitch_bot</div>
             <div class="card__desc">Python-бот для поддержания присутствия в чатах Twitch через IRC с TLS-подключением и автоматическим переподключением.</div>
             <div class="card__tags">
-              <span class="tag" style="border-style: dashed;">Python</span>
-              <span class="tag" style="border-style: dashed;">IRC</span>
+              <span class="tag">Python</span>
+              <span class="tag">IRC</span>
+            </div>
+            <div class="card__cta">
+              <span>Смотреть код</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </div>
           </div>
           <div class="card__glow"></div>
         </a>
 
-        <a href="https://github.com/AlekBlackk/tg_edit_bot" target="_blank" rel="noopener" class="card" style="animation-delay: 0.4s; --card-color: #f97316;">
+        <a href="https://github.com/AlekBlackk/tg_edit_bot" target="_blank" rel="noopener" class="card" style="animation-delay: 0.4s; --card-color: #34d399;">
           <div class="card__top">
             <div class="card__dots"><span></span><span></span><span></span></div>
             <div class="card__file">tg_edit_bot.py</div>
           </div>
           <div class="card__preview"
-            style="--preview-bg: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(249, 115, 22, 0.05));">
+            style="--preview-bg: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(52, 211, 153, 0.05));">
             <div class="card__preview-bg"></div>
             <!-- изображение с ИИ-искрой -->
             <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
@@ -365,20 +388,24 @@
             <div class="card__title">tg_edit_bot</div>
             <div class="card__desc">Telegram-бот для генерации и редактирования изображений через ComfyUI: апскейл, удаление фона и улучшение промптов с ИИ.</div>
             <div class="card__tags">
-              <span class="tag" style="border-style: dashed;">Python</span>
-              <span class="tag" style="border-style: dashed;">ComfyUI</span>
+              <span class="tag">Python</span>
+              <span class="tag">ComfyUI</span>
+            </div>
+            <div class="card__cta">
+              <span>Смотреть код</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </div>
           </div>
           <div class="card__glow"></div>
         </a>
 
-        <a href="https://github.com/AlekBlackk/portfolio_site" target="_blank" rel="noopener" class="card" style="animation-delay: 0.5s; --card-color: #22d3ee;">
+        <a href="https://github.com/AlekBlackk/portfolio_site" target="_blank" rel="noopener" class="card" style="animation-delay: 0.5s; --card-color: #60a5fa;">
           <div class="card__top">
             <div class="card__dots"><span></span><span></span><span></span></div>
             <div class="card__file">portfolio_site.js</div>
           </div>
           <div class="card__preview"
-            style="--preview-bg: linear-gradient(135deg, rgba(34, 211, 238, 0.15), rgba(34, 211, 238, 0.05));">
+            style="--preview-bg: linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(96, 165, 250, 0.05));">
             <div class="card__preview-bg"></div>
             <!-- окно браузера с тегами кода -->
             <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
@@ -394,20 +421,24 @@
             <div class="card__title">portfolio_site</div>
             <div class="card__desc">Персональный сайт-портфолио в стиле IDE с интерактивной анимацией, разделом проектов и контактными ссылками.</div>
             <div class="card__tags">
-              <span class="tag" style="border-style: dashed;">JavaScript</span>
-              <span class="tag" style="border-style: dashed;">Live</span>
+              <span class="tag">JavaScript</span>
+              <span class="tag">Live</span>
+            </div>
+            <div class="card__cta">
+              <span>Смотреть код</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </div>
           </div>
           <div class="card__glow"></div>
         </a>
 
-        <a href="https://github.com/AlekBlackk/td_game_2d" target="_blank" rel="noopener" class="card" style="animation-delay: 0.6s; --card-color: #eab308;">
+        <a href="https://github.com/AlekBlackk/td_game_2d" target="_blank" rel="noopener" class="card" style="animation-delay: 0.6s; --card-color: #a855f7;">
           <div class="card__top">
             <div class="card__dots"><span></span><span></span><span></span></div>
             <div class="card__file">last_bastion.cs</div>
           </div>
           <div class="card__preview"
-            style="--preview-bg: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(234, 179, 8, 0.05));">
+            style="--preview-bg: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(168, 85, 247, 0.05));">
             <div class="card__preview-bg"></div>
             <!-- крепостная башня с зубцами -->
             <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
@@ -422,20 +453,24 @@
             <div class="card__title">Last Bastion</div>
             <div class="card__desc">2D tower-defense игра на Unity: волны врагов и боссы, прокачка башен, экономика на золоте и ресурсах.</div>
             <div class="card__tags">
-              <span class="tag" style="border-style: dashed;">C#</span>
-              <span class="tag" style="border-style: dashed;">Unity</span>
+              <span class="tag">C#</span>
+              <span class="tag">Unity</span>
+            </div>
+            <div class="card__cta">
+              <span>Смотреть код</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </div>
           </div>
           <div class="card__glow"></div>
         </a>
 
-        <a href="https://github.com/AlekBlackk/sportsbet" target="_blank" rel="noopener" class="card" style="animation-delay: 0.7s; --card-color: #ef4444;">
+        <a href="https://github.com/AlekBlackk/sportsbet" target="_blank" rel="noopener" class="card" style="animation-delay: 0.7s; --card-color: #f59e0b;">
           <div class="card__top">
             <div class="card__dots"><span></span><span></span><span></span></div>
             <div class="card__file">sportsbet.py</div>
           </div>
           <div class="card__preview"
-            style="--preview-bg: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));">
+            style="--preview-bg: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));">
             <div class="card__preview-bg"></div>
             <!-- растущий график коэффициентов -->
             <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
@@ -451,8 +486,12 @@
             <div class="card__title">sportsbet</div>
             <div class="card__desc">Telegram-бот анализирует футбольные и хоккейные матчи, вычисляет вероятности, выявляет выгодные ставки, сравнивает коэффициенты.</div>
             <div class="card__tags">
-              <span class="tag" style="border-style: dashed;">Python</span>
-              <span class="tag" style="border-style: dashed;">Bot</span>
+              <span class="tag">Python</span>
+              <span class="tag">Bot</span>
+            </div>
+            <div class="card__cta">
+              <span>Смотреть код</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </div>
           </div>
           <div class="card__glow"></div>
