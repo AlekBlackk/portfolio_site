@@ -22,6 +22,7 @@
   --hologram-glow: rgba(168, 85, 247, 0.6);
   --hologram-accent: rgba(255, 255, 255, 0.2);
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --section-pad-y: clamp(64px, 8vw, 112px);
 }
 
 #bg-canvas {
@@ -213,7 +214,7 @@ button:focus-visible,
 
 /* ── Hero Section ── */
 .hero {
-  padding: 60px 40px 40px;
+  padding: var(--section-pad-y) 40px;
   position: relative;
   min-height: 60vh;
   display: grid;
@@ -781,7 +782,7 @@ button:focus-visible,
 
 /* ── About Section (source file view) ── */
 .about {
-  padding: 104px 40px 64px;
+  padding: var(--section-pad-y) 40px;
 }
 
 .code-file {
@@ -933,7 +934,7 @@ button:focus-visible,
 
 /* ── Projects Section ── */
 .projects {
-  padding: 72px 40px 88px;
+  padding: var(--section-pad-y) 40px;
 }
 
 .projects__grid {
@@ -1236,7 +1237,7 @@ svg.card__icon {
 
 /* ── Contacts Section ── */
 .contacts {
-  padding: 96px 40px 112px;
+  padding: var(--section-pad-y) 40px;
   display: flex;
   flex-direction: column;
 }
@@ -1469,7 +1470,7 @@ svg.card__icon {
     flex-direction: column;
     gap: 40px;
   }
-  
+
   .contacts-visual {
     height: 350px;
     width: 100%;
@@ -1655,7 +1656,7 @@ body {
   }
 
   .hero__buttons {
-    padding-left: 46px;
+    padding-left: 0;
     flex-direction: column;
     gap: 8px;
   }
