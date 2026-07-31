@@ -29,17 +29,17 @@
 
   <!-- Tab Bar -->
   <nav class="tab-bar">
-    <button class="tab active" data-target="hero" aria-label="home.tsx" aria-current="page">
+    <button class="tab active" data-target="hero" aria-label="home.js" aria-current="page">
       <span class="tab__icon" aria-hidden="true">⌂</span>
-      <span class="tab__label">home.tsx</span>
+      <span class="tab__label">home.js</span>
     </button>
-    <button class="tab" data-target="projects" aria-label="projects.tsx">
+    <button class="tab" data-target="projects" aria-label="projects.js">
       <span class="tab__icon" aria-hidden="true">◈</span>
-      <span class="tab__label">projects.tsx</span>
+      <span class="tab__label">projects.js</span>
     </button>
-    <button class="tab" data-target="contacts" aria-label="contacts.tsx">
+    <button class="tab" data-target="contacts" aria-label="contacts.js">
       <span class="tab__icon" aria-hidden="true">✉</span>
-      <span class="tab__label">contacts.tsx</span>
+      <span class="tab__label">contacts.js</span>
     </button>
   </nav>
 
@@ -50,6 +50,7 @@
     <section class="hero" id="hero">
       <div class="hero__glow"></div>
       <h1 class="visually-hidden">sadmore — Full-Stack Developer</h1>
+      <div class="hero__left">
       <div class="hero__code" aria-hidden="true">
         <div class="code-line">
           <span class="line-number">1</span>
@@ -94,6 +95,7 @@
           Telegram
         </a>
       </div>
+      </div>
       <div class="hero__graphics">
         <!-- Floating Terminal -->
         <div class="floating-panel panel-terminal" data-panel-id="build-process">
@@ -103,18 +105,18 @@
             <div style="width: 42px"></div> <!-- spacer -->
           </div>
           <div class="panel-body term-content">
-            <div class="t-line"><span class="t-prompt">~/project ➜</span> <span class="t-cmd">npm run build --
-                --detailed</span></div>
-            <div class="t-line t-dim"> [vite v5.0.0] building for production...</div>
-            <div class="t-line t-dim"> transforming (34) src/components/Hero.tsx</div>
-            <div class="t-line t-success">✓ 42 modules transformed.</div>
-            <div class="t-line t-dim">dist/index.html <span class="t-size">1.24 kB</span></div>
-            <div class="t-line t-dim">dist/style.css <span class="t-size">12.45 kB</span> <span
-                class="t-highlight">[optimized]</span></div>
-            <div class="t-line t-dim">dist/script.js <span class="t-size">8.12 kB</span> <span
-                class="t-highlight">[optimized]</span></div>
+            <div class="t-line"><span class="t-prompt">~/wheels_parser ➜</span> <span class="t-cmd">python -m build
+                --wheel</span></div>
+            <div class="t-line t-dim"> collecting sources from src/wheels_parser</div>
+            <div class="t-line t-dim"> compiling parser/telegram_watcher.py</div>
+            <div class="t-line t-success">✓ 42 modules compiled.</div>
+            <div class="t-line t-dim">dist/wheels_parser.whl <span class="t-size">84.2 kB</span></div>
+            <div class="t-line t-dim">tests/ <span class="t-size">18 passed</span> <span
+                class="t-highlight">[0 failed]</span></div>
+            <div class="t-line t-dim">ruff check <span class="t-size">31 files</span> <span
+                class="t-highlight">[clean]</span></div>
             <div class="t-line t-success" style="margin-top: 8px;">✓ built in 1.42s</div>
-            <div class="t-line"><span class="t-prompt">~/project ➜</span><span class="t-cursor"></span></div>
+            <div class="t-line"><span class="t-prompt">~/wheels_parser ➜</span><span class="t-cursor"></span></div>
           </div>
         </div>
 
@@ -157,10 +159,10 @@
             </div>
 
             <div class="tech-grid">
-              <div class="tech-box active" style="--box-accent: var(--keyword-blue);">React</div>
-              <div class="tech-box">TS</div>
-              <div class="tech-box">Node</div>
-              <div class="tech-box active" style="--box-accent: var(--string-green)">Tailwind</div>
+              <div class="tech-box active" style="--box-accent: var(--keyword-blue);">Python</div>
+              <div class="tech-box">C#</div>
+              <div class="tech-box">Flask</div>
+              <div class="tech-box active" style="--box-accent: var(--string-green)">JS</div>
             </div>
           </div>
         </div>
@@ -419,7 +421,7 @@
             <div class="terminal-list">
               <a href="https://github.com/AlekBlackk" target="_blank" rel="noopener noreferrer" class="terminal-item">
                 <span class="terminal-item__type">link</span>
-                <span class="terminal-item__name">github.tsx</span>
+                <span class="terminal-item__name">github.js</span>
                 <span class="terminal-item__arrow">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -433,7 +435,7 @@
               </a>
               <a href="https://t.me/sadmoreee" target="_blank" rel="noopener noreferrer" class="terminal-item">
                 <span class="terminal-item__type">link</span>
-                <span class="terminal-item__name">telegram.tsx</span>
+                <span class="terminal-item__name">telegram.js</span>
                 <span class="terminal-item__arrow">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -453,10 +455,10 @@
           <div class="visual-glow"></div>
           <canvas id="contacts-canvas" data-testid="contacts-canvas" aria-label="Contacts visual canvas"></canvas>
           <div class="visual-labels">
-            <span class="visual-label" style="--d: 0s; --top: 10%; --left: 10%;">React</span>
-            <span class="visual-label" style="--d: 1s; --top: 80%; --left: 15%;">Node.js</span>
-            <span class="visual-label" style="--d: 2s; --top: 20%; --left: 80%;">TypeScript</span>
-            <span class="visual-label" style="--d: 3s; --top: 75%; --left: 85%;">Next.js</span>
+            <span class="visual-label" style="--d: 0s; --top: 10%; --left: 10%;">Python</span>
+            <span class="visual-label" style="--d: 1s; --top: 80%; --left: 15%;">JavaScript</span>
+            <span class="visual-label" style="--d: 2s; --top: 20%; --left: 80%;">C#</span>
+            <span class="visual-label" style="--d: 3s; --top: 75%; --left: 85%;">Flask</span>
           </div>
         </div>
       </div>
@@ -503,7 +505,7 @@
       </div>
       <div class="status-bar__item status-bar__item--accent">
         <span class="status-bar__icon">{}</span>
-        <span>TypeScript JSX</span>
+        <span>JavaScript</span>
       </div>
       <div class="status-bar__item status-bar__item--prettier">
         <span class="status-bar__icon">✓</span>

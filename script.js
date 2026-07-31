@@ -977,12 +977,12 @@
     if (!term) return;
 
     const buildOutput = [
-      { text: " [vite v5.0.0] building for production...", class: "t-dim" },
-      { text: " transforming (34) src/components/Hero.tsx", class: "t-dim" },
-      { text: "✓ 42 modules transformed.", class: "t-success" },
-      { text: "dist/index.html 1.24 kB", class: "t-dim" },
-      { text: "dist/style.css 12.45 kB [optimized]", class: "t-dim" },
-      { text: "dist/script.js 8.12 kB [optimized]", class: "t-dim" },
+      { text: " collecting sources from src/wheels_parser", class: "t-dim" },
+      { text: " compiling parser/telegram_watcher.py", class: "t-dim" },
+      { text: "✓ 42 modules compiled.", class: "t-success" },
+      { text: "dist/wheels_parser.whl 84.2 kB", class: "t-dim" },
+      { text: "tests/ 18 passed [0 failed]", class: "t-dim" },
+      { text: "ruff check 31 files [clean]", class: "t-dim" },
       { text: "✓ built in 1.42s", class: "t-success", style: "margin-top: 8px;" }
     ];
 

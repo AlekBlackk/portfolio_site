@@ -217,9 +217,21 @@ button:focus-visible,
   padding: 60px 40px 40px;
   position: relative;
   min-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
+  align-items: center;
+  gap: 48px;
+}
+
+.hero__left {
+  grid-column: 1;
+  min-width: 0;
+}
+
+@media (max-width: 1200px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
 }
 
 .hero__glow {
@@ -275,13 +287,17 @@ button:focus-visible,
 }
 
 .code-name {
-  font-size: 28px;
+  font-size: clamp(38px, 5.2vw, 60px);
   font-weight: 700;
-  color: var(--accent);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--accent-light);
+  text-shadow: 0 0 32px rgba(168, 85, 247, 0.45);
 }
 
 .code-role {
-  font-size: 16px;
+  font-size: 19px;
+  font-weight: 600;
 }
 
 .cursor {
@@ -360,11 +376,11 @@ button:focus-visible,
 
 /* ── Hero Graphics (Dashboard) ── */
 .hero__graphics {
-  position: absolute;
-  right: 28%;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 480px;
+  position: relative;
+  grid-column: 2;
+  justify-self: end;
+  width: 100%;
+  max-width: 480px;
   height: 400px;
   pointer-events: none;
   z-index: 10;
@@ -1490,11 +1506,11 @@ body {
   }
 
   .code-name {
-    font-size: 22px;
+    font-size: 34px;
   }
 
   .code-role {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .hero__buttons {
