@@ -5,6 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>sadmore — portfolio</title>
+  <meta name="description" content="sadmore — фулстек-разработчик. Портфолио: парсеры, Telegram-боты, десктоп-приложения, игры на Python, JavaScript и C#.">
+  <meta property="og:title" content="sadmore — portfolio">
+  <meta property="og:description" content="Портфолио разработчика: Python, JavaScript, C#. Парсеры, Telegram-боты, десктоп-приложения, игры.">
+  <meta property="og:type" content="website">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -25,16 +29,16 @@
 
   <!-- Tab Bar -->
   <nav class="tab-bar">
-    <button class="tab active" data-target="hero">
-      <span class="tab__icon">⌂</span>
+    <button class="tab active" data-target="hero" aria-label="home.tsx" aria-current="page">
+      <span class="tab__icon" aria-hidden="true">⌂</span>
       <span class="tab__label">home.tsx</span>
     </button>
-    <button class="tab" data-target="projects">
-      <span class="tab__icon">◈</span>
+    <button class="tab" data-target="projects" aria-label="projects.tsx">
+      <span class="tab__icon" aria-hidden="true">◈</span>
       <span class="tab__label">projects.tsx</span>
     </button>
-    <button class="tab" data-target="contacts">
-      <span class="tab__icon">✉</span>
+    <button class="tab" data-target="contacts" aria-label="contacts.tsx">
+      <span class="tab__icon" aria-hidden="true">✉</span>
       <span class="tab__label">contacts.tsx</span>
     </button>
   </nav>
@@ -45,7 +49,8 @@
     <!-- Hero -->
     <section class="hero" id="hero">
       <div class="hero__glow"></div>
-      <div class="hero__code">
+      <h1 class="visually-hidden">sadmore — Full-Stack Developer</h1>
+      <div class="hero__code" aria-hidden="true">
         <div class="code-line">
           <span class="line-number">1</span>
           <span class="code-comment">// привет, я</span>
@@ -80,7 +85,7 @@
           </svg>
           GitHub
         </a>
-        <a href="https://t.me/" target="_blank" rel="noopener noreferrer" class="btn btn--outline">
+        <a href="https://t.me/sadmoreee" target="_blank" rel="noopener noreferrer" class="btn btn--outline">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
             <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -166,7 +171,7 @@
 
     <!-- Projects -->
     <section class="projects" id="projects">
-      <div class="section-comment">// projects</div>
+      <h2 class="section-comment">// projects</h2>
       <div class="projects__grid">
 
         <a href="https://github.com/AlekBlackk/wheels_parser" target="_blank" rel="noopener" class="card" style="animation-delay: 0s; --card-color: #4ade80;">
@@ -398,7 +403,7 @@
 
     <!-- Contacts -->
     <section class="contacts" id="contacts">
-      <div class="section-comment">// contacts</div>
+      <h2 class="section-comment">// contacts</h2>
 
       <div class="contacts-content">
         <div class="contacts-terminal">
@@ -412,7 +417,7 @@
             <div class="terminal-line"><span class="terminal-prompt">➜</span> <span class="terminal-command">ls -l
                 /socials</span></div>
             <div class="terminal-list">
-              <a href="https://github.com/AlekBlackk" target="_blank" class="terminal-item">
+              <a href="https://github.com/AlekBlackk" target="_blank" rel="noopener noreferrer" class="terminal-item">
                 <span class="terminal-item__type">link</span>
                 <span class="terminal-item__name">github.tsx</span>
                 <span class="terminal-item__arrow">
@@ -426,7 +431,7 @@
                 </span>
                 <span class="terminal-item__value">sadmore</span>
               </a>
-              <a href="https://t.me/" target="_blank" class="terminal-item">
+              <a href="https://t.me/sadmoreee" target="_blank" rel="noopener noreferrer" class="terminal-item">
                 <span class="terminal-item__type">link</span>
                 <span class="terminal-item__name">telegram.tsx</span>
                 <span class="terminal-item__arrow">
@@ -436,7 +441,7 @@
                     <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                   </svg>
                 </span>
-                <span class="terminal-item__value">@sadmore</span>
+                <span class="terminal-item__value">@sadmoreee</span>
               </a>
             </div>
             <div class="terminal-line"><span class="terminal-prompt">➜</span> <span class="terminal-cursor"></span></div>
@@ -478,15 +483,15 @@
     </div>
 
     <div class="status-bar__group">
-      <div class="status-bar__item status-bar__item--interactive" id="restore-panels-btn" data-testid="restore-panels-btn" aria-label="Restore hidden windows" style="display: none;">
-        <span class="status-bar__icon">↺</span>
+      <button type="button" class="status-bar__item status-bar__item--interactive" id="restore-panels-btn" data-testid="restore-panels-btn" aria-label="Restore hidden windows" style="display: none;">
+        <span class="status-bar__icon" aria-hidden="true">↺</span>
         <span>Restore Windows</span>
-      </div>
-      <div class="status-bar__item status-bar__item--interactive"
+      </button>
+      <button type="button" class="status-bar__item status-bar__item--interactive"
         onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-        <span class="status-bar__icon">↑</span>
+        <span class="status-bar__icon" aria-hidden="true">↑</span>
         <span>Back to Top</span>
-      </div>
+      </button>
       <div class="status-bar__item">
         <span>Ln 42, Col 1</span>
       </div>

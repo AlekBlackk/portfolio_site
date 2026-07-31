@@ -291,7 +291,13 @@
 
   function setActiveTab(activeId) {
     tabs.forEach(tab => {
-      tab.classList.toggle('active', tab.dataset.target === activeId);
+      const isActive = tab.dataset.target === activeId;
+      tab.classList.toggle('active', isActive);
+      if (isActive) {
+        tab.setAttribute('aria-current', 'page');
+      } else {
+        tab.removeAttribute('aria-current');
+      }
     });
   }
 
