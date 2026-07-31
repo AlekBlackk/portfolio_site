@@ -243,9 +243,9 @@
 
   // Typing Effect
   const roles = [
-    'Full-Stack Developer',
-    'UI/UX Enthusiast',
-    'Open Source Contributor',
+    'AI Product Builder',
+    'Vibe Coder',
+    'Специалист по AI-инструментам',
     'Problem Solver'
   ];
 
@@ -599,6 +599,7 @@
         let baseColor = 'rgba(226, 232, 240, 0.2)';
         if (el.classList.contains('card')) baseColor = 'rgba(168, 85, 247, 0.4)';
         else if (el.id === 'hero') baseColor = 'rgba(52, 211, 153, 0.4)';
+        else if (el.id === 'about') baseColor = 'rgba(244, 114, 182, 0.4)';
         else if (el.id === 'projects') baseColor = 'rgba(96, 165, 250, 0.4)';
         else if (el.classList.contains('floating-panel')) baseColor = 'rgba(234, 179, 8, 0.4)';
 
