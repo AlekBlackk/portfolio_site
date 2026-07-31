@@ -286,6 +286,8 @@
   // Tab Navigation
   const tabs = Array.from(document.querySelectorAll('.tab'));
   const sections = Array.from(document.querySelectorAll('section[id]'));
+  const titleBarEl = document.querySelector('.title-bar');
+  const tabBarEl = document.querySelector('.tab-bar');
   let isTabScrolling = false;
   let scrollTimeout = null;
 
@@ -302,10 +304,7 @@
   }
 
   function getStickyOffset() {
-    const titleBar = document.querySelector('.title-bar');
-    const tabBar = document.querySelector('.tab-bar');
-
-    return [titleBar, tabBar].reduce((total, element) => {
+    return [titleBarEl, tabBarEl].reduce((total, element) => {
       return total + (element ? element.getBoundingClientRect().height : 0);
     }, 0);
   }
@@ -338,6 +337,11 @@
 
     document.documentElement.style.setProperty('--sticky-offset', `${stickyOffset}px`);
     document.documentElement.style.setProperty('--scroll-spacer', `${spacerHeight}px`);
+
+    if (titleBarEl) {
+      const titleBarHeight = titleBarEl.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--title-bar-height', `${titleBarHeight}px`);
+    }
   }
 
   function syncActiveTabFromScroll() {
@@ -397,6 +401,8 @@
     });
   });
 
+  let scrollRafId = null;
+
   function handleScroll() {
     if (isTabScrolling) {
       clearTimeout(scrollTimeout);
@@ -406,7 +412,14 @@
       }, 150);
       return;
     }
-    syncActiveTabFromScroll();
+
+    // Coalesce rapid native scroll events (can fire faster than paint) so the
+    // section-metrics layout reads run at most once per animation frame.
+    if (scrollRafId) return;
+    scrollRafId = requestAnimationFrame(() => {
+      scrollRafId = null;
+      syncActiveTabFromScroll();
+    });
   }
 
   window.addEventListener('scroll', handleScroll, { passive: true });
@@ -529,6 +542,8 @@
       });
     });
 
+    let effectsRafId = null;
+
     const animateEffects = () => {
       // Glow trail lerp
       glowX += (mouseX - glowX) * 0.12;
@@ -558,8 +573,11 @@
       spotlight.style.webkitMaskImage = mask;
       spotlight.style.maskImage = mask;
 
-      requestAnimationFrame(animateEffects);
+      effectsRafId = requestAnimationFrame(animateEffects);
     };
+
+    onPause.push(() => cancelAnimationFrame(effectsRafId));
+    onResume.push(() => { animateEffects(); });
 
     animateEffects();
   }
@@ -578,11 +596,13 @@
       const docHeight = document.documentElement.scrollHeight;
       const mapHeight = minimap.offsetHeight;
       const mapWidth = minimap.offsetWidth;
+      const dpr = window.devicePixelRatio || 1;
 
-      minimapCanvas.width = mapWidth;
-      minimapCanvas.height = mapHeight;
+      minimapCanvas.width = mapWidth * dpr;
+      minimapCanvas.height = mapHeight * dpr;
       minimapCanvas.style.width = `${mapWidth}px`;
       minimapCanvas.style.height = `${mapHeight}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       const scale = mapHeight / docHeight;
 
@@ -1102,12 +1122,16 @@
     }
 
     function initParticles() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       particles = [];
       const gap = 50; // Match VS Code grid feel
-      for (let y = 0; y < canvas.height + gap; y += gap) {
-        for (let x = 0; x < canvas.width + gap; x += gap) {
+      for (let y = 0; y < window.innerHeight + gap; y += gap) {
+        for (let x = 0; x < window.innerWidth + gap; x += gap) {
           particles.push(new Particle(x, y));
         }
       }
@@ -1116,7 +1140,7 @@
     let bgRafId = null;
 
     function animateBackground() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
@@ -1160,8 +1184,10 @@
     let angleY = 0;
     let targetAngleX = 0;
     let targetAngleY = 0;
-    const count = 120;
+    const count = 160;
     const radius = 140;
+    let cssWidth = 0;
+    let cssHeight = 0;
 
     class Point3D {
       constructor(theta, phi) {
@@ -1193,8 +1219,8 @@
         // Perspective
         const perspective = 350;
         const scale = perspective / (perspective + z2);
-        const px = x2 * scale + contactsCanvas.width / 2;
-        const py = y1 * scale + contactsCanvas.height / 2;
+        const px = x2 * scale + cssWidth / 2;
+        const py = y1 * scale + cssHeight / 2;
 
         return { x: px, y: py, z: z2, scale };
       }
@@ -1210,9 +1236,13 @@
     }
 
     function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
       const rect = contactsCanvas.getBoundingClientRect();
-      contactsCanvas.width = rect.width;
-      contactsCanvas.height = rect.height;
+      cssWidth = rect.width;
+      cssHeight = rect.height;
+      contactsCanvas.width = rect.width * dpr;
+      contactsCanvas.height = rect.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
     window.addEventListener('resize', resizeCanvas);
@@ -1246,9 +1276,11 @@
     }
 
     let sphereRafId = null;
+    let sphereInViewport = false;
+    let spherePageVisible = !document.hidden;
 
     function animateSphere() {
-      ctx.clearRect(0, 0, contactsCanvas.width, contactsCanvas.height);
+      ctx.clearRect(0, 0, cssWidth, cssHeight);
 
       angleX += (targetAngleX - angleX) * 0.05 + 0.002;
       angleY += (targetAngleY - angleY) * 0.05 + 0.002;
@@ -1259,15 +1291,15 @@
       projected.sort((a, b) => b.z - a.z);
 
       // Draw lines between nearby points
-      ctx.lineWidth = 0.5;
+      ctx.lineWidth = 0.6;
       for (let i = 0; i < projected.length; i++) {
         for (let j = i + 1; j < projected.length; j++) {
           const p1 = projected[i];
           const p2 = projected[j];
           const d = Math.hypot(p1.x - p2.x, p1.y - p2.y);
 
-          if (d < 65) {
-            const opacity = (1 - d / 65) * 0.15 * p1.scale;
+          if (d < 70) {
+            const opacity = (1 - d / 70) * 0.28 * p1.scale;
             ctx.strokeStyle = `rgba(168, 85, 247, ${opacity})`;
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
@@ -1279,11 +1311,11 @@
 
       // Draw dots
       projected.forEach(p => {
-        const size = 1.6 * p.scale;
+        const size = 2.2 * p.scale;
         const opacityFront = (p.z + radius) / (2 * radius);
-        const opacity = Math.max(0.1, opacityFront);
+        const opacity = Math.max(0.18, opacityFront);
 
-        ctx.fillStyle = `rgba(168, 85, 247, ${opacity * 0.7 + 0.3})`;
+        ctx.fillStyle = `rgba(168, 85, 247, ${opacity * 0.65 + 0.35})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
         ctx.fill();
@@ -1299,9 +1331,26 @@
       sphereRafId = requestAnimationFrame(animateSphere);
     }
 
-    onPause.push(() => cancelAnimationFrame(sphereRafId));
-    onResume.push(() => { animateSphere(); });
+    function startSphere() {
+      if (sphereInViewport && spherePageVisible && !sphereRafId) animateSphere();
+    }
 
-    animateSphere();
+    function stopSphere() {
+      if (sphereRafId) {
+        cancelAnimationFrame(sphereRafId);
+        sphereRafId = null;
+      }
+    }
+
+    // The pairwise point-distance loop below is O(n^2); only run it while
+    // the sphere is actually scrolled into view.
+    const sphereObserver = new IntersectionObserver(entries => {
+      sphereInViewport = entries[0].isIntersecting;
+      if (sphereInViewport) startSphere(); else stopSphere();
+    }, { threshold: 0.05 });
+    sphereObserver.observe(contactsCanvas);
+
+    onPause.push(() => { spherePageVisible = false; stopSphere(); });
+    onResume.push(() => { spherePageVisible = true; startSphere(); });
   }
 })();
