@@ -7,6 +7,13 @@
   const onPause = [];
   const onResume = [];
 
+  // Read by syncActiveTabFromScroll (called synchronously below, on initial
+  // layout, and on every scroll) to skip the scroll-spy while a project file
+  // tab owns the tab bar. Declared this early so that first synchronous call
+  // never trips a temporal-dead-zone error — see "Project File Tabs" below
+  // for where this actually gets set.
+  let activeProjectId = null;
+
   const LAST_SECTION_BOTTOM_GAP = 80;
   const MAX_REGULAR_SECTION_TOP = 250;
   const MIN_SECTION_TOP_GAP = 24;
@@ -423,6 +430,13 @@
   }
 
   function syncActiveTabFromScroll() {
+    // A file tab (opened from a project card) owns the tab bar until closed.
+    // Without this guard, a scroll animation already in flight when the file
+    // tab opens (e.g. click a section tab, then immediately click a card
+    // before the smooth-scroll settles) fires this after the fact and flips
+    // a section tab back to active behind the still-open file view.
+    if (activeProjectId) return;
+
     const activeId = getActiveSectionId({
       sections: getSectionMetrics(),
       scrollY: window.scrollY,
@@ -439,6 +453,12 @@
   function goToSection(targetId) {
     const target = document.getElementById(targetId);
     if (!target) return;
+
+    // Leaving to a section tab always closes file view, regardless of
+    // whether it was triggered by a tab click, the command palette, or
+    // anything else that scrolls the page — setActiveTab below covers the
+    // tab-bar restore, so skip closeProjectView's own restore pass.
+    closeProjectView({ restoreSection: false });
 
     syncLayoutMetrics();
 
@@ -509,6 +529,229 @@
   });
   syncLayoutMetrics();
   syncActiveTabFromScroll();
+
+  // --- Project File Tabs (cards open a "file" tab instead of leaving) ---
+  // Clicking a project card no longer jumps straight to GitHub: it opens a
+  // dedicated file tab in the tab bar with a README-style detail view.
+  // GitHub becomes a plain button inside that view. Multiple project tabs
+  // can stay open at once, each closable with its own ×, same as the
+  // section tabs but dynamic — the tab bar actually reacts to what you do.
+  const projectView = document.getElementById('project-view');
+  const projectViewBackdrop = projectView ? projectView.querySelector('[data-project-view-backdrop]') : null;
+  const projectViewContent = projectView ? projectView.querySelector('[data-project-view-content], .project-view__content') : null;
+
+  const PROJECT_README = {
+    wheels_parser: {
+      stack: ['Python', 'asyncio', 'Telethon'],
+      readme: 'Слушает Telegram-каналы стримеров через Telethon, ловит момент запуска колеса фортуны BetBoom и вытаскивает прямую ссылку раньше, чем это делает чат. Асинхронный воркер держит сразу несколько каналов, переживает разрывы соединения и логирует каждый пойманный дроп.'
+    },
+    screen_recorder: {
+      stack: ['JavaScript', 'Electron', 'FFmpeg'],
+      readme: 'Десктопный рекордер с кольцевым буфером: последние N минут экрана всегда под рукой, сохранить их можно задним числом по горячей клавише. Встроенный редактор — для быстрой нарезки клипов сразу после записи.'
+    },
+    'file-manager': {
+      stack: ['Python', 'Flask', 'JavaScript'],
+      readme: 'Веб-файловый менеджер: загрузка, drag-and-drop, предпросмотр и скачивание файлов, мягкое удаление через корзину вместо необратимого rm. Работает поверх обычной файловой системы сервера, без базы данных.'
+    },
+    twitch_bot: {
+      stack: ['Python', 'IRC', 'TLS'],
+      readme: 'Держит присутствие в чатах Twitch через прямое IRC-подключение с TLS. Автопереподключение при разрыве связи, ротация каналов, минимум зависимостей поверх стандартного IRC.'
+    },
+    tg_edit_bot: {
+      stack: ['Python', 'ComfyUI', 'aiogram'],
+      readme: 'Telegram-бот поверх ComfyUI: апскейл, удаление фона, улучшение промптов нейросетью. Очередь задач на стороне бота — чтобы параллельные запросы пользователей не клали ComfyUI.'
+    },
+    portfolio_site: {
+      stack: ['HTML', 'CSS', 'JavaScript'],
+      readme: 'Этот самый сайт: интерфейс в стиле IDE без единого фреймворка. Вкладки-файлы, миникарта, командная палитра, плавающие панели — всё на чистом JS и CSS custom properties.'
+    },
+    td_game_2d: {
+      stack: ['C#', 'Unity'],
+      readme: '«Last Bastion» — 2D tower defense на Unity: волны врагов с боссами, прокачка башен, экономика на золоте и ресурсах, несколько карт с разной сложностью.'
+    },
+    sportsbet: {
+      stack: ['Python', 'pandas', 'Telegram API'],
+      readme: 'Анализирует линии букмекеров по футболу и хоккею, считает вероятности исходов и сравнивает коэффициенты между площадками в поиске статистически выгодных ставок. Результаты приходят прямо в Telegram.'
+    }
+  };
+
+  const GITHUB_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.28 1.15-.28 2.35 0 3.5-.73 1.02-1.08 2.25-1 3.5 0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>`;
+
+  const openProjectTabs = new Map(); // project id -> tab <button>
+
+  function escapeHtmlAttr(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function renderProjectView(id) {
+    if (!projectViewContent) return;
+
+    const card = document.querySelector(`.card[data-project="${id}"]`);
+    if (!card) return;
+
+    const extra = PROJECT_README[id] || {};
+    const title = card.querySelector('.card__title')?.textContent.trim() || id;
+    const fileLabel = card.querySelector('.card__file')?.textContent.trim() || id;
+    const desc = card.querySelector('.card__desc')?.textContent.trim() || '';
+    const tags = Array.from(card.querySelectorAll('.tag')).map(t => t.textContent.trim());
+    const stack = extra.stack && extra.stack.length ? extra.stack : tags;
+    const iconSvg = card.querySelector('.card__icon')?.outerHTML || '';
+    const cardColor = card.style.getPropertyValue('--card-color') || 'var(--accent)';
+    const previewBg = card.querySelector('.card__preview')?.style.getPropertyValue('--preview-bg') || '';
+    const href = card.href;
+
+    if (projectView) projectView.style.setProperty('--card-color', cardColor);
+
+    projectViewContent.innerHTML = `
+      <div class="project-view__panel">
+        <div class="project-view__head">
+          <span class="project-view__dots" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="project-view__filename">${escapeHtmlAttr(fileLabel)}</span>
+          <span class="project-view__meta">README</span>
+          <button type="button" class="project-view__close" data-project-view-close aria-label="Закрыть ${escapeHtmlAttr(fileLabel)}">✕</button>
+        </div>
+        <div class="project-view__screenshot" style="--preview-bg: ${escapeHtmlAttr(previewBg)};">
+          ${iconSvg}
+        </div>
+        <div class="project-view__body">
+          <h3 class="project-view__title">${escapeHtmlAttr(title)}</h3>
+          <p class="project-view__desc">${escapeHtmlAttr(desc)}</p>
+          ${extra.readme ? `<p class="project-view__readme">${escapeHtmlAttr(extra.readme)}</p>` : ''}
+          <div class="project-view__stack">
+            ${stack.map(s => `<span class="tag">${escapeHtmlAttr(s)}</span>`).join('')}
+          </div>
+          <a href="${escapeHtmlAttr(href)}" target="_blank" rel="noopener noreferrer" class="btn btn--primary project-view__github">
+            ${GITHUB_ICON_SVG}
+            Открыть на GitHub
+          </a>
+        </div>
+      </div>
+    `;
+
+    const closeBtn = projectViewContent.querySelector('[data-project-view-close]');
+    if (closeBtn) closeBtn.addEventListener('click', () => closeProjectView());
+  }
+
+  function closeProjectView({ restoreSection = true } = {}) {
+    if (!activeProjectId) return;
+
+    const tab = openProjectTabs.get(activeProjectId);
+    if (tab) {
+      tab.classList.remove('active');
+      tab.removeAttribute('aria-current');
+    }
+
+    activeProjectId = null;
+    if (projectView) projectView.hidden = true;
+
+    if (restoreSection) {
+      setActiveTab(currentSectionId || sections[0]?.id);
+    }
+  }
+
+  function activateProjectTab(id) {
+    const tab = openProjectTabs.get(id);
+    if (!tab || !projectView) return;
+
+    tabs.forEach(t => {
+      t.classList.remove('active');
+      t.removeAttribute('aria-current');
+    });
+    openProjectTabs.forEach(t => {
+      t.classList.remove('active');
+      t.removeAttribute('aria-current');
+    });
+
+    tab.classList.add('active');
+    tab.setAttribute('aria-current', 'page');
+    activeProjectId = id;
+
+    renderProjectView(id);
+    projectView.hidden = false;
+    projectView.scrollTop = 0;
+  }
+
+  function removeProjectTab(id) {
+    const tab = openProjectTabs.get(id);
+    if (!tab) return;
+
+    const wasActive = activeProjectId === id;
+    tab.remove();
+    openProjectTabs.delete(id);
+
+    if (wasActive) closeProjectView();
+  }
+
+  function openProjectView(id) {
+    if (!tabBarEl || !projectView) return;
+
+    let tab = openProjectTabs.get(id);
+    if (!tab) {
+      const card = document.querySelector(`.card[data-project="${id}"]`);
+      const fileLabel = card?.querySelector('.card__file')?.textContent.trim() || `${id}.md`;
+
+      // The tab itself is a <button> (matches the static section tabs), so
+      // its close control can't be a nested <button> — invalid HTML, and
+      // browsers will silently hoist it out of the tree. A <span> with a
+      // manual role="button" + Enter/Space handling gets the same keyboard
+      // behavior without that problem.
+      tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = 'tab tab--project';
+      tab.dataset.projectTab = id;
+      tab.setAttribute('aria-label', fileLabel);
+      tab.innerHTML = `
+        <span class="tab__icon" aria-hidden="true">◆</span>
+        <span class="tab__label">${escapeHtmlAttr(fileLabel)}</span>
+        <span class="tab__close" data-close-project role="button" tabindex="0" aria-label="Закрыть ${escapeHtmlAttr(fileLabel)}">✕</span>
+      `;
+
+      tab.addEventListener('click', (e) => {
+        if (e.target.closest('[data-close-project]')) return;
+        activateProjectTab(id);
+      });
+
+      const closeControl = tab.querySelector('[data-close-project]');
+      closeControl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeProjectTab(id);
+      });
+      closeControl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.stopPropagation();
+          removeProjectTab(id);
+        }
+      });
+
+      tabBarEl.appendChild(tab);
+      openProjectTabs.set(id, tab);
+    }
+
+    activateProjectTab(id);
+  }
+
+  document.querySelectorAll('.card[data-project]').forEach(card => {
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+      openProjectView(card.dataset.project);
+    });
+  });
+
+  if (projectViewBackdrop) {
+    projectViewBackdrop.addEventListener('click', () => closeProjectView());
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && activeProjectId && !isPaletteOpen()) {
+      e.preventDefault();
+      closeProjectView();
+    }
+  });
 
   // --- Scroll Progress Bar ---
   // Visible on all breakpoints, unlike the minimap which hides under 768px.
@@ -1730,10 +1973,14 @@
       return;
     }
 
-    if (mod && e.shiftKey && key === 'p') {
-      e.preventDefault();
-      openPalette();
-      return;
+    if (!mod && !e.altKey && !isPaletteOpen() && (e.code === 'Slash' || e.key === '/')) {
+      const active = document.activeElement;
+      const isEditable = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+      if (!isEditable) {
+        e.preventDefault();
+        openPalette();
+        return;
+      }
     }
 
     if (isPaletteOpen() && e.key === 'Escape') {
@@ -1999,7 +2246,7 @@
 
     const rows = [
       ['Ctrl/Cmd + K', 'Открыть палитру'],
-      ['Ctrl/Cmd + Shift + P', 'Открыть палитру'],
+      ['/', 'Открыть палитру'],
       ['↑ / ↓', 'Перемещение по списку'],
       ['Enter', 'Выполнить команду'],
       ['Esc', 'Закрыть палитру']

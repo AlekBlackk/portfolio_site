@@ -209,6 +209,40 @@ button:focus-visible,
   font-size: var(--fs-md);
 }
 
+.tab--project {
+  position: relative;
+  padding-right: 36px;
+}
+
+.tab__close {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.tab--project:hover .tab__close,
+.tab--project.active .tab__close,
+.tab__close:focus-visible {
+  opacity: 1;
+}
+
+.tab__close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text);
+}
+
 /* ── Main Content ── */
 .main {
   position: relative;
@@ -1540,19 +1574,19 @@ svg.card__icon {
   transition: all 0.2s ease;
 }
 
-.status-bar__item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-secondary);
-}
-
 .status-bar__item--interactive {
   cursor: pointer;
-  background: none;
+  background: rgba(255, 255, 255, 0.05);
   border: none;
   font: inherit;
-  color: inherit;
+  color: var(--text-secondary);
   -webkit-appearance: none;
   appearance: none;
+}
+
+.status-bar__item--interactive:hover {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--accent);
 }
 
 .status-bar__icon {
@@ -1565,17 +1599,8 @@ svg.card__icon {
   background: rgba(168, 85, 247, 0.05);
 }
 
-.status-bar__item--git:hover {
-  background: rgba(168, 85, 247, 0.1);
-  color: var(--accent);
-}
-
 .status-bar__item--errors {
   color: #fff;
-}
-
-.status-bar__item--errors:hover {
-  background: rgba(239, 68, 68, 0.1);
 }
 
 .status-bar__item--accent {
@@ -2051,5 +2076,201 @@ body {
 @media (max-width: 640px) {
   .command-palette {
     padding-top: 8vh;
+  }
+}
+
+/* ── Project Detail View ── */
+/* Opened from a project card as a "file tab"; the underlying page never
+   scrolls behind it — the panel is a fixed, full-height layer that owns its
+   own scroll, so there's nothing to lock/unlock on open/close. */
+.project-view {
+  position: fixed;
+  top: var(--sticky-offset, 71px);
+  left: 0;
+  right: 0;
+  bottom: 28px;
+  /* matches the minimap's own top/bottom insets — centers against the
+     visible content pane (between the tab bar and the status bar), not
+     the raw viewport, which was pulling the panel visibly downward. */
+  z-index: 95;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* `safe center` still centers short panels, but falls back to top-aligned
+     scrolling instead of clipping when a readme is too tall for the viewport.
+     Older browsers ignore this line and keep the plain `center` above. */
+  align-items: safe center;
+  overflow-y: auto;
+  padding: 40px 24px;
+}
+
+.project-view[hidden] {
+  display: none;
+}
+
+.project-view__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 15, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: -1;
+}
+
+.project-view__content {
+  width: 100%;
+  max-width: 720px;
+  animation: project-view-in 0.25s ease both;
+}
+
+@keyframes project-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.project-view__panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px color-mix(in srgb, var(--card-color, var(--accent)) 15%, transparent);
+}
+
+.project-view__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-tabs);
+  border-bottom: 1px solid var(--border);
+}
+
+.project-view__dots {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.project-view__dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: block;
+  background: var(--border);
+}
+
+.project-view__dots span:nth-child(1) {
+  background: var(--red);
+}
+
+.project-view__dots span:nth-child(2) {
+  background: var(--yellow);
+}
+
+.project-view__dots span:nth-child(3) {
+  background: var(--green);
+}
+
+.project-view__filename {
+  color: var(--text);
+  font-size: var(--fs-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-view__meta {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.project-view__close {
+  flex-shrink: 0;
+  margin-left: 12px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--fs-lg);
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+  padding: 3px 7px;
+  border-radius: 4px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.project-view__close:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.project-view__screenshot {
+  position: relative;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
+  background: var(--preview-bg, linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(168, 85, 247, 0.05)));
+}
+
+.project-view__screenshot .card__icon {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  color: var(--card-color, var(--accent));
+  opacity: 1;
+  filter: drop-shadow(0 0 24px color-mix(in srgb, var(--card-color, var(--accent)) 55%, transparent));
+}
+
+.project-view__body {
+  padding: 24px;
+}
+
+.project-view__title {
+  font-size: var(--fs-xl);
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.project-view__desc,
+.project-view__readme {
+  color: var(--text-secondary);
+  font-size: var(--fs-base);
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+
+.project-view__stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.project-view__github {
+  width: fit-content;
+}
+
+@media (max-width: 640px) {
+  .project-view {
+    padding: 20px 12px;
+  }
+
+  .project-view__screenshot {
+    height: 160px;
+  }
+
+  .project-view__body {
+    padding: 18px;
   }
 }
