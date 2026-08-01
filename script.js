@@ -1667,4 +1667,84 @@
     onPause.push(() => { spherePageVisible = false; stopSphere(); });
     onResume.push(() => { spherePageVisible = true; startSphere(); });
   }
+
+  // --- Command Palette ---
+  let paletteOpenerEl = null;
+  let paletteQuery = '';
+  let paletteView = 'commands'; // 'commands' | 'shortcuts'
+  let paletteSelectedIndex = 0;
+  let paletteVisibleCommands = [];
+  let paletteCopyFeedbackId = null;
+  let paletteCopyFeedbackTimeout = null;
+
+  const palette = document.getElementById('command-palette');
+  const paletteBackdrop = palette ? palette.querySelector('[data-cp-backdrop]') : null;
+  const paletteInput = document.getElementById('command-palette-input');
+  const paletteList = document.getElementById('command-palette-list');
+  const paletteResultCount = document.getElementById('command-palette-result-count');
+  const paletteTrigger = document.getElementById('command-palette-trigger');
+
+  function isPaletteOpen() {
+    return !!palette && palette.style.display !== 'none';
+  }
+
+  function openPalette() {
+    if (!palette || isPaletteOpen()) return;
+
+    paletteOpenerEl = document.activeElement;
+    paletteView = 'commands';
+    paletteQuery = '';
+    paletteSelectedIndex = 0;
+    if (paletteInput) paletteInput.value = '';
+
+    palette.style.display = 'flex';
+    document.documentElement.style.overflow = 'hidden';
+
+    if (paletteInput) paletteInput.focus();
+  }
+
+  function closePalette() {
+    if (!palette || !isPaletteOpen()) return;
+
+    palette.style.display = 'none';
+    document.documentElement.style.overflow = '';
+
+    clearTimeout(paletteCopyFeedbackTimeout);
+    paletteCopyFeedbackId = null;
+
+    if (paletteOpenerEl && typeof paletteOpenerEl.focus === 'function') {
+      paletteOpenerEl.focus();
+    }
+    paletteOpenerEl = null;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    const key = e.key.toLowerCase();
+    const mod = e.ctrlKey || e.metaKey;
+
+    if (mod && key === 'k') {
+      e.preventDefault();
+      openPalette();
+      return;
+    }
+
+    if (mod && e.shiftKey && key === 'p') {
+      e.preventDefault();
+      openPalette();
+      return;
+    }
+
+    if (isPaletteOpen() && e.key === 'Escape') {
+      e.preventDefault();
+      closePalette();
+    }
+  });
+
+  if (paletteTrigger) {
+    paletteTrigger.addEventListener('click', () => openPalette());
+  }
+
+  if (paletteBackdrop) {
+    paletteBackdrop.addEventListener('click', () => closePalette());
+  }
 })();
