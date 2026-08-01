@@ -436,46 +436,48 @@
     }
   }
 
+  function goToSection(targetId) {
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    syncLayoutMetrics();
+
+    const stickyOffset = getStickyOffset();
+    const lastSection = sections[sections.length - 1];
+    const targetRect = target.getBoundingClientRect();
+    const targetTop = window.scrollY + targetRect.top;
+    const documentHeight = document.documentElement.scrollHeight;
+    const preferredViewportTop = getSectionViewportTop({
+      viewportHeight: window.innerHeight,
+      stickyOffset,
+      isLastSection: target === lastSection,
+      sectionHeight: targetRect.height,
+      sectionTop: targetTop,
+      documentHeight
+    });
+
+    isTabScrolling = true;
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      isTabScrolling = false;
+    }, 800);
+
+    setActiveTab(targetId);
+
+    window.scrollTo({
+      top: getScrollTargetY({
+        targetTop: targetRect.top,
+        currentScrollY: window.scrollY,
+        stickyOffset,
+        preferredViewportTop
+      }),
+      behavior: 'smooth'
+    });
+  }
+
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      const targetId = tab.dataset.target;
-      const target = document.getElementById(targetId);
-
-      if (target) {
-        syncLayoutMetrics();
-
-        const stickyOffset = getStickyOffset();
-        const lastSection = sections[sections.length - 1];
-        const targetRect = target.getBoundingClientRect();
-        const targetTop = window.scrollY + targetRect.top;
-        const documentHeight = document.documentElement.scrollHeight;
-        const preferredViewportTop = getSectionViewportTop({
-          viewportHeight: window.innerHeight,
-          stickyOffset,
-          isLastSection: target === lastSection,
-          sectionHeight: targetRect.height,
-          sectionTop: targetTop,
-          documentHeight
-        });
-
-        isTabScrolling = true;
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-          isTabScrolling = false;
-        }, 800);
-
-        setActiveTab(targetId);
-
-        window.scrollTo({
-          top: getScrollTargetY({
-            targetTop: targetRect.top,
-            currentScrollY: window.scrollY,
-            stickyOffset,
-            preferredViewportTop
-          }),
-          behavior: 'smooth'
-        });
-      }
+      goToSection(tab.dataset.target);
     });
   });
 
