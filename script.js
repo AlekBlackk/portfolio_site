@@ -1963,6 +1963,67 @@
     }, 1200);
   }
 
+  function renderShortcutsView() {
+    if (!paletteList) return;
+
+    paletteList.innerHTML = '';
+    paletteSelectedIndex = 0;
+    paletteVisibleCommands = [{
+      command: {
+        id: 'shortcuts-back',
+        category: '',
+        label: '← Назад к командам',
+        keepOpen: true,
+        run: () => {
+          paletteView = 'commands';
+          paletteQuery = '';
+          paletteSelectedIndex = 0;
+          if (paletteInput) paletteInput.value = '';
+          renderPaletteList();
+        }
+      },
+      matches: []
+    }];
+
+    const backItem = document.createElement('li');
+    backItem.id = 'command-palette-option-shortcuts-back';
+    backItem.className = 'command-palette__item command-palette__item--selected';
+    backItem.setAttribute('role', 'option');
+    backItem.setAttribute('aria-selected', 'true');
+    backItem.textContent = '← Назад к командам';
+    backItem.addEventListener('click', () => executeCommand(paletteVisibleCommands[0].command));
+    paletteList.appendChild(backItem);
+
+    const rows = [
+      ['Ctrl/Cmd + K', 'Открыть палитру'],
+      ['Ctrl/Cmd + Shift + P', 'Открыть палитру'],
+      ['↑ / ↓', 'Перемещение по списку'],
+      ['Enter', 'Выполнить команду'],
+      ['Esc', 'Закрыть палитру']
+    ];
+
+    rows.forEach(([keys, desc]) => {
+      const row = document.createElement('li');
+      row.className = 'command-palette__shortcut-row';
+      row.setAttribute('role', 'presentation');
+
+      const kbd = document.createElement('kbd');
+      kbd.textContent = keys;
+      row.appendChild(kbd);
+
+      const span = document.createElement('span');
+      span.textContent = desc;
+      row.appendChild(span);
+
+      paletteList.appendChild(row);
+    });
+
+    if (paletteInput) {
+      paletteInput.setAttribute('aria-activedescendant', 'command-palette-option-shortcuts-back');
+    }
+    updateResultCount(1);
+  }
+
   if (paletteInput) {
     paletteInput.addEventListener('keydown', (e) => {
       if (!isPaletteOpen()) return;
