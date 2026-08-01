@@ -568,6 +568,10 @@
         <span class="status-bar__icon" aria-hidden="true">↑</span>
         <span>Back to Top</span>
       </button>
+      <button type="button" class="status-bar__item status-bar__item--interactive" id="command-palette-trigger" data-testid="command-palette-trigger" aria-label="Открыть командную палитру">
+        <span class="status-bar__icon" aria-hidden="true">⌘</span>
+        <span>Ctrl K</span>
+      </button>
       <div class="status-bar__item">
         <span data-testid="status-ln-col">Ln 1, Col 1</span>
       </div>
@@ -597,6 +601,34 @@
   <div class="minimap" id="minimap" data-testid="minimap" aria-label="Page minimap">
     <canvas id="minimap-canvas" data-testid="minimap-canvas" aria-label="Page minimap canvas"></canvas>
     <div class="minimap-slider" id="minimap-slider"></div>
+  </div>
+
+  <!-- Command Palette -->
+  <div class="command-palette" id="command-palette" data-testid="command-palette" style="display: none;">
+    <div class="command-palette__backdrop" data-cp-backdrop></div>
+    <div class="command-palette__panel" role="dialog" aria-modal="true" aria-label="Командная палитра">
+      <div class="command-palette__input-row">
+        <span class="command-palette__prompt" aria-hidden="true">❯</span>
+        <input
+          type="text"
+          class="command-palette__input"
+          id="command-palette-input"
+          role="combobox"
+          aria-expanded="true"
+          aria-controls="command-palette-list"
+          aria-autocomplete="list"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="Введите команду или начните поиск…">
+      </div>
+      <ul class="command-palette__list" id="command-palette-list" role="listbox" aria-label="Команды"></ul>
+      <div class="command-palette__footer">
+        <span><kbd>↑↓</kbd> навигация</span>
+        <span><kbd>⏎</kbd> выбрать</span>
+        <span><kbd>esc</kbd> закрыть</span>
+      </div>
+      <span class="visually-hidden" id="command-palette-result-count" aria-live="polite"></span>
+    </div>
   </div>
 
   <script src="script.js"></script>
