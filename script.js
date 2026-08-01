@@ -1895,10 +1895,17 @@
       label.innerHTML = highlightMatches(match.command.label, match.matches);
       item.appendChild(label);
 
-      const category = document.createElement('span');
-      category.className = 'command-palette__item-category';
-      category.textContent = match.command.category;
-      item.appendChild(category);
+      if (paletteCopyFeedbackId === match.command.id) {
+        const feedback = document.createElement('span');
+        feedback.className = 'command-palette__item-feedback';
+        feedback.textContent = '✓ Скопировано';
+        item.appendChild(feedback);
+      } else {
+        const category = document.createElement('span');
+        category.className = 'command-palette__item-category';
+        category.textContent = match.command.category;
+        item.appendChild(category);
+      }
 
       item.addEventListener('mouseenter', () => {
         paletteSelectedIndex = index;
@@ -1927,6 +1934,15 @@
   function executeCommand(command) {
     if (!command) return;
 
+    if (command.copyText) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(command.copyText)
+          .then(() => showCopyFeedback(command.id))
+          .catch(() => {});
+      }
+      return;
+    }
+
     if (typeof command.run === 'function') {
       command.run();
     }
@@ -1934,6 +1950,17 @@
     if (!command.keepOpen) {
       closePalette();
     }
+  }
+
+  function showCopyFeedback(commandId) {
+    paletteCopyFeedbackId = commandId;
+    renderPaletteList();
+
+    clearTimeout(paletteCopyFeedbackTimeout);
+    paletteCopyFeedbackTimeout = setTimeout(() => {
+      paletteCopyFeedbackId = null;
+      if (isPaletteOpen()) renderPaletteList();
+    }, 1200);
   }
 
   if (paletteInput) {
