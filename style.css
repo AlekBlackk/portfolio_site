@@ -228,6 +228,16 @@ button:focus-visible,
   padding: var(--section-pad-y) 40px;
   position: relative;
   min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-head--hero {
+  margin-bottom: 24px;
+}
+
+.hero__grid {
+  flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
   align-items: center;
@@ -240,7 +250,7 @@ button:focus-visible,
 }
 
 @media (max-width: 1200px) {
-  .hero {
+  .hero__grid {
     grid-template-columns: 1fr;
   }
 
