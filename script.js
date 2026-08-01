@@ -220,8 +220,62 @@
     ];
   }
 
+  function fuzzyMatch(query, text) {
+    const q = query.toLowerCase();
+    const t = text.toLowerCase();
+
+    if (q.length === 0) {
+      return { score: 0, matches: [] };
+    }
+
+    const matches = [];
+    let qi = 0;
+    let score = 0;
+    let prevMatchIndex = -1;
+
+    for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+      if (t[ti] !== q[qi]) continue;
+
+      matches.push(ti);
+
+      let charScore = 1;
+      if (prevMatchIndex !== -1 && prevMatchIndex === ti - 1) {
+        charScore += 3; // contiguous run bonus
+      }
+      if (ti === 0 || /[\s\-_/]/.test(t[ti - 1])) {
+        charScore += 2; // start-of-word bonus
+      }
+
+      score += charScore;
+      prevMatchIndex = ti;
+      qi++;
+    }
+
+    if (qi < q.length) {
+      return null; // not every query character matched, in order
+    }
+
+    return { score, matches };
+  }
+
+  function filterCommands(query, commands) {
+    if (!query) {
+      return commands.map(command => ({ command, score: 0, matches: [] }));
+    }
+
+    return commands
+      .map(command => {
+        const result = fuzzyMatch(query, command.label);
+        return result ? { command, score: result.score, matches: result.matches } : null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.score - a.score);
+  }
+
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
+      fuzzyMatch,
+      filterCommands,
       getActiveSectionId,
       getMinimapScrollTarget,
       getPanelControlDescriptors,
