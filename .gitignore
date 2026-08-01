@@ -6,7 +6,7 @@
 .playwright-mcp/
 
 # Internal docs (plans, specs)
-docs/superpowers/
+docs/
 
 # VS Code
 .vscode/
