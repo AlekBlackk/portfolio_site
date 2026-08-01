@@ -1884,7 +1884,7 @@
       return;
     }
 
-    matches.forEach((match) => {
+    matches.forEach((match, index) => {
       const item = document.createElement('li');
       item.id = `command-palette-option-${match.command.id}`;
       item.className = 'command-palette__item';
@@ -1900,6 +1900,15 @@
       category.textContent = match.command.category;
       item.appendChild(category);
 
+      item.addEventListener('mouseenter', () => {
+        paletteSelectedIndex = index;
+        updateSelectionHighlight();
+      });
+
+      item.addEventListener('click', () => {
+        executeCommand(match.command);
+      });
+
       paletteList.appendChild(item);
     });
 
@@ -1912,6 +1921,57 @@
       paletteQuery = paletteInput.value;
       paletteSelectedIndex = 0;
       renderPaletteList();
+    });
+  }
+
+  function executeCommand(command) {
+    if (!command) return;
+
+    if (typeof command.run === 'function') {
+      command.run();
+    }
+
+    if (!command.keepOpen) {
+      closePalette();
+    }
+  }
+
+  if (paletteInput) {
+    paletteInput.addEventListener('keydown', (e) => {
+      if (!isPaletteOpen()) return;
+
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        return;
+      }
+
+      const count = paletteVisibleCommands.length;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (count > 0) {
+          paletteSelectedIndex = (paletteSelectedIndex + 1) % count;
+          updateSelectionHighlight();
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (count > 0) {
+          paletteSelectedIndex = (paletteSelectedIndex - 1 + count) % count;
+          updateSelectionHighlight();
+        }
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        paletteSelectedIndex = 0;
+        updateSelectionHighlight();
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        paletteSelectedIndex = Math.max(count - 1, 0);
+        updateSelectionHighlight();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const match = paletteVisibleCommands[paletteSelectedIndex];
+        if (match) executeCommand(match.command);
+      }
     });
   }
 })();
