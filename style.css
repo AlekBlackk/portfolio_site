@@ -1749,15 +1749,6 @@ svg.card__icon {
   border-left-color: var(--accent);
 }
 
-.activity-bar__icon--decorative {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.activity-bar__icon--decorative:hover {
-  color: var(--text-muted);
-}
-
 .explorer {
   width: calc(var(--sidebar-width) - var(--activity-bar-width));
   background: var(--bg-panel);
@@ -1819,17 +1810,6 @@ svg.card__icon {
 
 .explorer__row--file {
   padding-left: 30px;
-}
-
-.explorer__row--readonly {
-  color: var(--text-muted);
-  opacity: 0.55;
-  cursor: default;
-}
-
-.explorer__row--readonly:hover {
-  background: none;
-  color: var(--text-muted);
 }
 
 .explorer__chevron {
