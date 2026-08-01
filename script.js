@@ -358,6 +358,14 @@
   const sectionOrder = tabs.map(tab => tab.dataset.target);
   let currentSectionId = sections[0]?.id || null;
 
+  // Sidebar: Activity Bar + Explorer
+  const sidebarEl = document.getElementById('sidebar');
+  const mainEl = document.querySelector('.main');
+  const sidebarExplorerToggle = document.getElementById('activity-explorer-btn');
+  const explorerFolderSrc = document.getElementById('explorer-folder-src');
+  const explorerFolderSrcChildren = document.getElementById('explorer-folder-src-children');
+  const explorerFiles = Array.from(document.querySelectorAll('.explorer__row--file[data-target]'));
+
   function renderStatusPosition(progress) {
     if (!statusPositionEl) return;
 
@@ -383,6 +391,9 @@
       } else {
         tab.removeAttribute('aria-current');
       }
+    });
+    explorerFiles.forEach(row => {
+      row.classList.toggle('is-active', row.dataset.target === activeId);
     });
     currentSectionId = activeId;
     renderStatusPosition();
@@ -500,6 +511,28 @@
       goToSection(tab.dataset.target);
     });
   });
+
+  explorerFiles.forEach(row => {
+    row.addEventListener('click', () => {
+      goToSection(row.dataset.target);
+    });
+  });
+
+  if (explorerFolderSrc && explorerFolderSrcChildren) {
+    explorerFolderSrc.addEventListener('click', () => {
+      const isExpanded = explorerFolderSrc.getAttribute('aria-expanded') === 'true';
+      explorerFolderSrc.setAttribute('aria-expanded', String(!isExpanded));
+      explorerFolderSrcChildren.classList.toggle('is-collapsed', isExpanded);
+    });
+  }
+
+  if (sidebarExplorerToggle && sidebarEl) {
+    sidebarExplorerToggle.addEventListener('click', () => {
+      const collapsed = sidebarEl.classList.toggle('is-collapsed');
+      sidebarExplorerToggle.setAttribute('aria-pressed', String(!collapsed));
+      mainEl?.classList.toggle('sidebar-collapsed', collapsed);
+    });
+  }
 
   let scrollRafId = null;
 
