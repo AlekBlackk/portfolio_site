@@ -6,13 +6,13 @@
 <!-- Замените ссылку на адрес GitHub Pages после включения деплоя -->
 **[Открыть демо →](https://alekblackk.github.io/portfolio_site/)**
 
-![Главный экран портфолио](docs/images/preview-desktop.png)
+![Главный экран портфолио](images/preview-desktop.png)
 
 ## Скриншоты
 
 | Проекты | Мобильная версия |
 | --- | --- |
-| ![Секция проектов](docs/images/preview-projects.png) | ![Мобильная версия](docs/images/preview-mobile.png) |
+| ![Секция проектов](images/preview-projects.png) | ![Мобильная версия](images/preview-mobile.png) |
 
 ## Возможности
 
