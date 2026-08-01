@@ -1700,6 +1700,8 @@
     palette.style.display = 'flex';
     document.documentElement.style.overflow = 'hidden';
 
+    renderPaletteList();
+
     if (paletteInput) paletteInput.focus();
   }
 
@@ -1746,5 +1748,170 @@
 
   if (paletteBackdrop) {
     paletteBackdrop.addEventListener('click', () => closePalette());
+  }
+
+  function getCommands() {
+    const commands = [
+      { id: 'nav-hero', category: 'Навигация', label: 'Перейти: Home', run: () => goToSection('hero') },
+      { id: 'nav-about', category: 'Навигация', label: 'Перейти: About', run: () => goToSection('about') },
+      { id: 'nav-projects', category: 'Навигация', label: 'Перейти: Projects', run: () => goToSection('projects') },
+      { id: 'nav-contacts', category: 'Навигация', label: 'Перейти: Contacts', run: () => goToSection('contacts') },
+      {
+        id: 'link-github',
+        category: 'Ссылки',
+        label: 'Открыть GitHub',
+        run: () => window.open('https://github.com/AlekBlackk/', '_blank', 'noopener,noreferrer')
+      },
+      {
+        id: 'link-telegram',
+        category: 'Ссылки',
+        label: 'Открыть Telegram',
+        run: () => window.open('https://t.me/sadmoreee', '_blank', 'noopener,noreferrer')
+      },
+      {
+        id: 'action-copy-github',
+        category: 'Действия',
+        label: 'Скопировать GitHub-профиль',
+        copyText: 'https://github.com/AlekBlackk/'
+      },
+      {
+        id: 'action-copy-telegram',
+        category: 'Действия',
+        label: 'Скопировать Telegram',
+        copyText: 'https://t.me/sadmoreee'
+      },
+      {
+        id: 'action-top',
+        category: 'Действия',
+        label: 'Наверх страницы',
+        run: () => window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    ];
+
+    const restoreBtn = document.getElementById('restore-panels-btn');
+    if (restoreBtn && restoreBtn.style.display !== 'none') {
+      commands.push({
+        id: 'action-restore-panels',
+        category: 'Действия',
+        label: 'Восстановить скрытые окна',
+        run: () => restoreBtn.click()
+      });
+    }
+
+    commands.push({
+      id: 'help-shortcuts',
+      category: 'Справка',
+      label: 'Показать горячие клавиши',
+      keepOpen: true,
+      run: () => {
+        paletteView = 'shortcuts';
+        paletteSelectedIndex = 0;
+        renderPaletteList();
+      }
+    });
+
+    return commands;
+  }
+
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function highlightMatches(label, matches) {
+    if (!matches || matches.length === 0) return escapeHtml(label);
+
+    const matchSet = new Set(matches);
+    let html = '';
+    for (let i = 0; i < label.length; i++) {
+      const char = escapeHtml(label[i]);
+      html += matchSet.has(i) ? `<mark class="command-palette__match">${char}</mark>` : char;
+    }
+    return html;
+  }
+
+  function updateResultCount(count) {
+    if (!paletteResultCount) return;
+    paletteResultCount.textContent = count === 0
+      ? 'Ничего не найдено'
+      : `Найдено команд: ${count}`;
+  }
+
+  function updateSelectionHighlight() {
+    if (!paletteList) return;
+
+    const items = Array.from(paletteList.querySelectorAll('.command-palette__item'));
+    items.forEach((item, i) => {
+      const isSelected = i === paletteSelectedIndex;
+      item.classList.toggle('command-palette__item--selected', isSelected);
+      item.setAttribute('aria-selected', String(isSelected));
+    });
+
+    const selectedItem = items[paletteSelectedIndex];
+    if (selectedItem && paletteInput) {
+      paletteInput.setAttribute('aria-activedescendant', selectedItem.id);
+      selectedItem.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  function renderPaletteList() {
+    if (!paletteList) return;
+
+    if (paletteView === 'shortcuts') {
+      renderShortcutsView();
+      return;
+    }
+
+    const matches = filterCommands(paletteQuery, getCommands());
+    paletteVisibleCommands = matches;
+
+    if (paletteSelectedIndex >= matches.length) {
+      paletteSelectedIndex = Math.max(matches.length - 1, 0);
+    }
+
+    paletteList.innerHTML = '';
+
+    if (matches.length === 0) {
+      const empty = document.createElement('li');
+      empty.className = 'command-palette__empty';
+      empty.setAttribute('role', 'presentation');
+      empty.textContent = `Ничего не найдено по «${paletteQuery}»`;
+      paletteList.appendChild(empty);
+      updateResultCount(0);
+      if (paletteInput) paletteInput.removeAttribute('aria-activedescendant');
+      return;
+    }
+
+    matches.forEach((match) => {
+      const item = document.createElement('li');
+      item.id = `command-palette-option-${match.command.id}`;
+      item.className = 'command-palette__item';
+      item.setAttribute('role', 'option');
+
+      const label = document.createElement('span');
+      label.className = 'command-palette__item-label';
+      label.innerHTML = highlightMatches(match.command.label, match.matches);
+      item.appendChild(label);
+
+      const category = document.createElement('span');
+      category.className = 'command-palette__item-category';
+      category.textContent = match.command.category;
+      item.appendChild(category);
+
+      paletteList.appendChild(item);
+    });
+
+    updateResultCount(matches.length);
+    updateSelectionHighlight();
+  }
+
+  if (paletteInput) {
+    paletteInput.addEventListener('input', () => {
+      paletteQuery = paletteInput.value;
+      paletteSelectedIndex = 0;
+      renderPaletteList();
+    });
   }
 })();
