@@ -1912,6 +1912,8 @@
         updateSelectionHighlight();
       });
 
+      item.addEventListener('mousedown', (e) => e.preventDefault());
+
       item.addEventListener('click', () => {
         executeCommand(match.command);
       });
@@ -1991,6 +1993,7 @@
     backItem.setAttribute('role', 'option');
     backItem.setAttribute('aria-selected', 'true');
     backItem.textContent = '← Назад к командам';
+    backItem.addEventListener('mousedown', (e) => e.preventDefault());
     backItem.addEventListener('click', () => executeCommand(paletteVisibleCommands[0].command));
     paletteList.appendChild(backItem);
 
